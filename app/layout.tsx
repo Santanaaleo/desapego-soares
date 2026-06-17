@@ -1,0 +1,21 @@
+import type { Metadata } from "next";
+import { Footer } from "@/components/layout/Footer";
+import { Header } from "@/components/layout/Header";
+import "@/styles/globals.css";
+
+export const metadata: Metadata = {
+  title: "DESAPEGO SOARES",
+  description: "Catálogo online de produtos originais."
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="pt-BR">
+      <body className="font-sans antialiased">
+        <Header />
+        <main>{children}</main>
+        <Footer />
+      </body>
+    </html>
+  );
+}

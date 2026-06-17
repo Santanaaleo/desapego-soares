@@ -7,13 +7,21 @@ import { categories } from "@/lib/constants";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import type { Product } from "@/types/product";
 
-export function CatalogFilters({ products }: { products: Product[] }) {
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("Todos");
+export function CatalogFilters({
+  products,
+  initialQuery = "",
+  initialCategory = "Todos"
+}: {
+  products: Product[];
+  initialQuery?: string;
+  initialCategory?: string;
+}) {
+  const [query, setQuery] = useState(initialQuery);
+  const [category, setCategory] = useState(initialCategory);
 
   const filtered = useMemo(() => {
     return products.filter((product) => {
-      const text = `${product.name} ${product.brand} ${product.description}`.toLowerCase();
+      const text = `${product.name} ${product.brand} ${product.category} ${product.description}`.toLowerCase();
       const matchesQuery = text.includes(query.toLowerCase());
       const matchesCategory = category === "Todos" || product.category === category;
       return matchesQuery && matchesCategory;
@@ -28,7 +36,7 @@ export function CatalogFilters({ products }: { products: Product[] }) {
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Pesquisar produto, marca ou descrição"
+            placeholder="Pesquisar produto, marca ou categoria"
             className="pl-11"
           />
         </label>
@@ -38,7 +46,7 @@ export function CatalogFilters({ products }: { products: Product[] }) {
               key={item}
               type="button"
               onClick={() => setCategory(item)}
-              className={`focus-ring h-10 shrink-0 rounded-md px-4 text-sm font-black uppercase transition ${
+              className={`focus-ring h-10 shrink-0 rounded-md px-4 text-sm font-semibold uppercase transition ${
                 category === item ? "bg-brand text-white" : "bg-neutral-100 text-neutral-950 hover:bg-neutral-200"
               }`}
             >

@@ -12,28 +12,30 @@ const categoryCovers: Record<ProductCategory, string> = {
   Polos: "/produtos/categorias/polos-categoria.png",
   Bonés: "/produtos/categorias/bones-categoria.png",
   Tênis: "/produtos/categorias/tenis-categoria.png",
-  Óculos: "/produtos/categorias/oculos-transparente.png"
+  Óculos: "/produtos/categorias/oculos-transparente.png",
+  Perfumes: "/produtos/categorias/perfumes-categoria.png"
 };
 
 const categoryImageFit: Record<ProductCategory, string> = {
-  Camisas: "object-contain object-center scale-[1.2] group-hover:scale-[1.23]",
+  Camisas: "object-contain object-center scale-[1.14] group-hover:scale-[1.17]",
   Polos: "object-contain object-center scale-[1.05] group-hover:scale-[1.08]",
   Bonés: "object-contain object-center scale-[1.06] group-hover:scale-[1.09]",
-  Tênis: "object-contain object-center scale-[1.1] group-hover:scale-[1.13]",
-  Óculos: "object-contain object-center scale-[1.1] group-hover:scale-[1.13]"
+  Tênis: "object-contain object-center scale-[1.02] group-hover:scale-[1.05]",
+  Óculos: "object-contain object-center scale-[1.02] group-hover:scale-[1.05]",
+  Perfumes: "object-contain object-center scale-[0.92] group-hover:scale-[0.96]"
 };
 
 export default function Home() {
   return (
     <div className="bg-white">
-      <section className="border-b border-neutral-200 bg-white md:bg-[linear-gradient(90deg,#000000_0%,#000000_45%,rgba(0,0,0,0.95)_58%,rgba(0,0,0,0.75)_70%,rgba(0,0,0,0.45)_82%,rgba(0,0,0,0.12)_94%,rgba(0,0,0,0)_100%)]">
-        <Container className="grid gap-0 py-0 md:h-[420px] md:max-h-[460px] md:grid-cols-[minmax(0,1fr)_500px] lg:grid-cols-[minmax(0,1fr)_580px]">
-          <div className="-mx-4 grid content-center bg-[linear-gradient(180deg,#0a0a0a_0%,#0a0a0a_86%,rgba(10,10,10,0)_100%)] px-4 py-5 text-white sm:-mx-6 sm:px-6 sm:py-7 md:mx-0 md:max-w-3xl md:bg-transparent md:px-0 md:py-10 lg:py-12">
-            <p className="text-[11px] font-black uppercase text-white/80 sm:text-xs">Desapego Soares</p>
-            <h1 className="mt-2 max-w-2xl font-display text-[28px] font-black uppercase leading-[0.98] sm:text-[34px] md:text-[46px] md:leading-[1.02] lg:text-[52px]">
+      <section className="border-b border-neutral-900 bg-black">
+        <Container className="grid gap-0 py-0 md:h-[430px] md:grid-cols-2">
+          <div className="-mx-4 grid content-center bg-black px-4 py-5 text-white sm:-mx-6 sm:px-6 sm:py-7 md:mx-0 md:px-0 md:pr-10 md:py-10 lg:py-12">
+            <p className="text-[11px] font-semibold uppercase text-white/80 sm:text-xs">Desapego Soares</p>
+            <h1 className="mt-2 max-w-2xl font-display text-[28px] font-semibold uppercase leading-[0.98] tracking-[0.04em] sm:text-[34px] md:text-[46px] md:leading-[1.02] lg:text-[52px]">
               Produtos originais para quem vive o corre
             </h1>
-            <p className="mt-2.5 max-w-xl text-[13px] font-bold leading-5 text-white/85 sm:mt-3 sm:text-base sm:leading-6">
+            <p className="mt-2.5 max-w-xl text-[13px] font-medium leading-5 text-white/85 sm:mt-3 sm:text-base sm:leading-6">
               Confira as peças disponíveis e chame no WhatsApp para fechar seu pedido.
             </p>
             <div className="mt-3.5 flex flex-col gap-3 sm:mt-5 sm:flex-row">
@@ -43,15 +45,16 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex h-[285px] items-center justify-center overflow-hidden bg-white py-2.5 sm:h-[330px] sm:py-4 md:z-10 md:h-full md:justify-end md:bg-transparent md:py-0">
+          <div className="-mx-4 flex h-[295px] items-center justify-center overflow-hidden bg-black py-2 sm:-mx-6 sm:h-[340px] sm:py-3 md:mx-0 md:h-full md:justify-center md:px-6 md:py-0">
             <Image
-              src="/logos/hero-personagem-logo-upscale.png"
+              src="/logos/logo-principal-hero.jpeg"
               alt="Logo principal DESAPEGO SOARES"
-              width={375}
-              height={666}
+              width={900}
+              height={1600}
               priority
-              sizes="(min-width: 1024px) 580px, (min-width: 768px) 500px, 100vw"
-              className="h-[470px] w-auto max-w-none object-contain object-center sm:h-[575px] md:h-[680px] lg:h-[730px]"
+              quality={100}
+              sizes="(min-width: 1024px) 520px, (min-width: 768px) 45vw, 100vw"
+              className="h-[440px] w-auto max-w-none object-contain object-center sm:h-[520px] md:h-[610px] lg:h-[660px]"
             />
           </div>
         </Container>
@@ -60,12 +63,12 @@ export default function Home() {
       <section className="border-b border-neutral-200 py-3 sm:py-4">
         <Container>
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="font-display text-base font-black uppercase text-neutral-950 sm:text-lg">Destaques</h2>
-            <Link href="/catalogo" className="text-xs font-black uppercase text-brand hover:text-neutral-950">
+            <h2 className="font-display text-base font-semibold uppercase text-neutral-950 sm:text-lg">Destaques</h2>
+            <Link href="/catalogo" className="text-xs font-semibold uppercase text-brand hover:text-neutral-950">
               Ver tudo
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             {categories.map((category) => {
               return (
                 <Link
@@ -97,8 +100,8 @@ export default function Home() {
         <Container>
           <div className="mb-4 flex items-end justify-between gap-4 sm:mb-5">
             <div>
-              <p className="text-xs font-black uppercase text-brand">Disponíveis agora</p>
-              <h2 className="mt-1 font-display text-xl font-black uppercase text-neutral-950 sm:text-2xl">
+              <p className="text-xs font-semibold uppercase text-brand">Disponíveis agora</p>
+              <h2 className="mt-1 font-display text-xl font-semibold uppercase text-neutral-950 sm:text-2xl">
                 Produtos por categoria
               </h2>
             </div>

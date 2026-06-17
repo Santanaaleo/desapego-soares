@@ -10,8 +10,8 @@ export function NewProductClient() {
   const router = useRouter();
   const { createProduct } = useProducts();
 
-  function handleSubmit(input: ProductInput) {
-    createProduct(input);
+  async function handleSubmit(input: ProductInput) {
+    await createProduct(input);
     router.push("/admin");
   }
 

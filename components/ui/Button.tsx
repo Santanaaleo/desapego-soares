@@ -14,7 +14,7 @@ const variants = {
 };
 
 export function Button({ href, variant = "primary", className = "", children, ...props }: ButtonProps) {
-  const classes = `focus-ring inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-bold uppercase tracking-normal transition ${variants[variant]} ${className}`;
+  const classes = `focus-ring inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-semibold uppercase tracking-normal transition ${variants[variant]} ${className}`;
 
   if (href) {
     return (

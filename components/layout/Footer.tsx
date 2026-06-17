@@ -19,18 +19,25 @@ export function Footer() {
             <p className="mt-3 max-w-md">Produtos originais, moda urbana brasileira e atendimento direto pelo WhatsApp.</p>
           </div>
           <div className="flex items-center gap-5 sm:justify-end">
-            <Link href="/catalogo" className="font-bold text-neutral-900 hover:text-brand">
-              Catalogo
+            <Link href="/catalogo" className="font-semibold text-neutral-900 hover:text-brand">
+              Catálogo
             </Link>
             <a
               href={`https://wa.me/${brand.whatsappNumber}`}
-              className="font-bold text-neutral-900 hover:text-brand"
+              className="font-semibold text-neutral-900 hover:text-brand"
               target="_blank"
               rel="noreferrer"
             >
               WhatsApp
             </a>
-            <span className="font-bold text-neutral-900">{brand.instagram}</span>
+            <a
+              href={brand.instagramUrl}
+              className="font-semibold text-neutral-900 hover:text-brand"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Instagram
+            </a>
           </div>
         </div>
         <p className="mt-6 border-t border-neutral-100 pt-4 text-center text-xs text-neutral-400">

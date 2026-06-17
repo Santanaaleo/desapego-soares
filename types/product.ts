@@ -1,4 +1,4 @@
-export type ProductCategory = "Camisas" | "Polos" | "Bonés" | "Tênis" | "Óculos";
+export type ProductCategory = "Camisas" | "Polos" | "Bonés" | "Tênis" | "Óculos" | "Perfumes";
 
 export type Product = {
   id: string;

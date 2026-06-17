@@ -3,7 +3,8 @@
 import { Menu, Search, ShoppingBag, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useState } from "react";
 import { useCart } from "@/hooks/useCart";
 import { Container } from "./Container";
 
@@ -16,14 +17,23 @@ const topMessages = ["SOMENTE PRODUTOS ORIGINAIS", "ENVIO PARA TODO BRASIL", "+3
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const router = useRouter();
   const { items } = useCart();
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  function submitSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const query = search.trim();
+    router.push(query ? `/catalogo?q=${encodeURIComponent(query)}` : "/catalogo");
+    setOpen(false);
+  }
 
   const bagButton = (
     <span className="relative flex h-10 w-10 items-center justify-center rounded-md bg-brand text-white transition hover:bg-neutral-950 md:h-11 md:w-11">
       <ShoppingBag size={20} />
       {cartCount > 0 ? (
-        <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-neutral-950 px-1 text-[10px] font-black leading-none text-white ring-2 ring-white">
+        <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-neutral-950 px-1 text-[10px] font-semibold leading-none text-white ring-2 ring-white">
           {cartCount}
         </span>
       ) : null}
@@ -74,16 +84,21 @@ export function Header() {
           </div>
         </div>
 
-        <Link
-          href="/catalogo"
-          className="focus-ring flex h-9 items-center gap-2 rounded-md border border-neutral-300 bg-neutral-50 px-3 text-xs font-bold text-neutral-500 transition hover:border-brand hover:bg-white hover:text-brand sm:h-11 sm:gap-3 sm:px-4 sm:text-sm"
-        >
-          <Search size={17} />
-          Buscar produto, marca ou categoria
-        </Link>
+        <form onSubmit={submitSearch} className="relative">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 sm:left-4"
+            size={17}
+          />
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Buscar produto, marca ou categoria"
+            className="focus-ring h-9 w-full rounded-md border border-neutral-300 bg-neutral-50 pl-9 pr-3 text-xs font-medium text-neutral-700 transition placeholder:text-neutral-500 hover:border-brand hover:bg-white sm:h-11 sm:pl-11 sm:pr-4 sm:text-sm"
+          />
+        </form>
 
         <div className="hidden items-center gap-5 md:flex">
-          <nav className="flex items-center gap-5 text-sm font-black uppercase text-neutral-950">
+          <nav className="flex items-center gap-5 text-sm font-semibold uppercase text-neutral-950">
             {links.map((link) => (
               <Link key={link.href} href={link.href} className="transition hover:text-brand">
                 {link.label}
@@ -103,11 +118,20 @@ export function Header() {
       {open ? (
         <div className="border-t border-neutral-200 bg-white md:hidden">
           <Container className="grid gap-1 py-3">
+            <form onSubmit={submitSearch} className="relative mb-2">
+              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={17} />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Buscar produto, marca ou categoria"
+                className="focus-ring h-10 w-full rounded-md border border-neutral-300 bg-neutral-50 pl-10 pr-3 text-sm font-medium text-neutral-700"
+              />
+            </form>
             {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-md px-2 py-3 text-sm font-black uppercase text-neutral-950"
+                className="rounded-md px-2 py-3 text-sm font-semibold uppercase text-neutral-950"
                 onClick={() => setOpen(false)}
               >
                 {link.label}

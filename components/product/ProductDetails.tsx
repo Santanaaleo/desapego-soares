@@ -33,14 +33,14 @@ export function ProductDetails({ product }: { product: Product }) {
   return (
     <div className="grid content-start gap-5">
       <div>
-        <p className="text-xs font-black uppercase text-brand">{product.category}</p>
-        <h1 className="mt-2 font-display text-3xl font-black uppercase leading-tight text-neutral-950 sm:text-4xl">
+        <p className="text-xs font-semibold uppercase text-brand">{product.category}</p>
+        <h1 className="mt-2 font-display text-3xl font-semibold uppercase leading-tight text-neutral-950 sm:text-4xl">
           {product.name}
         </h1>
-        <p className="mt-2 text-sm font-bold uppercase text-neutral-500">{product.brand}</p>
+        <p className="mt-2 text-sm font-medium uppercase text-neutral-500">{product.brand}</p>
       </div>
 
-      <p className="font-display text-3xl font-black text-neutral-950">{formatPrice(product.price)}</p>
+      <p className="font-display text-3xl font-extrabold text-neutral-950">{formatPrice(product.price)}</p>
       <p className="text-sm leading-6 text-neutral-700">{product.description}</p>
 
       <div className="grid gap-2 border-y border-neutral-200 py-4 text-sm">
@@ -56,7 +56,7 @@ export function ProductDetails({ product }: { product: Product }) {
 
       {availableSizes.length ? (
         <div>
-          <p className="mb-3 text-sm font-black uppercase text-neutral-950">Escolha o tamanho</p>
+          <p className="mb-3 text-sm font-semibold uppercase text-neutral-950">Escolha o tamanho</p>
           <div className="grid grid-cols-4 gap-2">
             {availableSizes.map((size) => (
               <button
@@ -66,7 +66,7 @@ export function ProductDetails({ product }: { product: Product }) {
                   setSelectedSize(size);
                   setError("");
                 }}
-                className={`focus-ring h-11 rounded-md border text-sm font-black transition ${
+                className={`focus-ring h-11 rounded-md border text-sm font-semibold transition ${
                   selectedSize === size
                     ? "border-brand bg-brand text-white"
                     : "border-neutral-300 bg-white text-neutral-950 hover:border-brand hover:text-brand"

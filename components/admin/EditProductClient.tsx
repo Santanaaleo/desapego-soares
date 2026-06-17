@@ -25,8 +25,8 @@ export function EditProductClient({ id }: { id: string }) {
     notFound();
   }
 
-  function handleSubmit(input: ProductInput) {
-    updateProduct(id, input);
+  async function handleSubmit(input: ProductInput) {
+    await updateProduct(id, input);
     router.push("/admin");
   }
 

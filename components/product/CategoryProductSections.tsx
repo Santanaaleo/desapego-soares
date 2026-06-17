@@ -19,10 +19,10 @@ export function CategoryProductSections() {
         return (
           <section key={category} className="grid gap-3">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="font-display text-xl font-black uppercase text-neutral-950 sm:text-2xl">{category}</h2>
+              <h2 className="font-display text-xl font-semibold uppercase text-neutral-950 sm:text-2xl">{category}</h2>
               <Link
                 href={`/catalogo?categoria=${category}`}
-                className="text-xs font-black uppercase text-brand hover:text-neutral-950"
+                className="text-xs font-semibold uppercase text-brand hover:text-neutral-950"
               >
                 Ver tudo
               </Link>

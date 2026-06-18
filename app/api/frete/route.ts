@@ -76,7 +76,7 @@ async function calculateWithSuperFrete(destinationCep: string) {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      "User-Agent": "Desapego Soares (integracao@superfrete.com)",
+      "User-Agent": "Desapego Soares (leonardosantana803@icloud.com)",
       accept: "application/json",
       "content-type": "application/json"
     },

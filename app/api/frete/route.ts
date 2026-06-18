@@ -5,6 +5,7 @@ import type { ShippingEstimate, ShippingOption } from "@/types/shipping";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const superFreteUrl = "https://api.superfrete.com/api/v0/calculator";
 const originCep = process.env.SUPERFRETE_ORIGIN_CEP?.trim() || "04257245";
 
 type SuperFreteOption = {
@@ -34,10 +35,11 @@ export async function GET() {
 async function calculateWithSuperFrete(destinationCep: string) {
   const token = process.env.SUPERFRETE_TOKEN?.trim();
 
-  console.info("[frete] Configuração SuperFrete", {
+  console.info("[frete] config:", {
     tokenConfigured: Boolean(token),
     originCepConfigured: Boolean(process.env.SUPERFRETE_ORIGIN_CEP?.trim()),
-    vercelEnvironment: process.env.VERCEL_ENV || "local"
+    vercelEnvironment: process.env.VERCEL_ENV || "local",
+    endpoint: superFreteUrl
   });
 
   if (!token) {
@@ -48,43 +50,53 @@ async function calculateWithSuperFrete(destinationCep: string) {
     );
   }
 
-  const response = await fetch("https://api.superfrete.com/api/v0/calculator", {
+  const payload = {
+    from: { postal_code: cleanCep(originCep) },
+    to: { postal_code: destinationCep },
+    services: "1,2,17",
+    options: {
+      own_hand: false,
+      receipt: false,
+      insurance_value: 0,
+      use_insurance_value: false
+    },
+    package: {
+      weight: 1,
+      length: 20,
+      width: 20,
+      height: 20
+    }
+  };
+
+  console.info("[frete] payload:", payload);
+
+  const response = await fetch(superFreteUrl, {
     method: "POST",
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
-      "User-Agent": "Desapego Soares frete estimado"
+      "User-Agent": "Desapego Soares (integracao@superfrete.com)",
+      accept: "application/json",
+      "content-type": "application/json"
     },
-    body: JSON.stringify({
-      from: { postal_code: cleanCep(originCep) },
-      to: { postal_code: destinationCep },
-      services: "1,2,17",
-      options: {
-        own_hand: false,
-        receipt: false,
-        insurance_value: 0,
-        use_insurance_value: false
-      },
-      package: {
-        height: 20,
-        width: 20,
-        length: 20,
-        weight: 1
-      }
-    }),
+    body: JSON.stringify(payload),
     cache: "no-store"
   });
 
-  const data = (await response.json().catch(() => null)) as SuperFreteOption[] | { message?: string } | null;
+  const responseText = await response.text();
+  let data: SuperFreteOption[] | Record<string, unknown> | null = null;
+
+  try {
+    data = responseText ? (JSON.parse(responseText) as SuperFreteOption[] | Record<string, unknown>) : null;
+  } catch {
+    data = null;
+  }
+
+  console.info("[frete] status:", response.status);
 
   if (!response.ok || !Array.isArray(data)) {
-    console.error("[frete] Erro na resposta da SuperFrete", {
-      status: response.status,
-      responseIsArray: Array.isArray(data)
-    });
+    console.error("[frete] response:", data ?? responseText);
     return NextResponse.json(
-      { error: "Não foi possível consultar a SuperFrete agora. Tente novamente em instantes." },
+      { error: "Não foi possível consultar o SuperFrete. Tente novamente em instantes." },
       { status: response.status || 502 }
     );
   }
@@ -109,6 +121,7 @@ async function calculateWithSuperFrete(destinationCep: string) {
     .filter(Boolean) as ShippingOption[];
 
   if (!options.length) {
+    console.error("[frete] response:", data);
     return NextResponse.json({ error: "Nenhuma modalidade de frete disponível para este CEP." }, { status: 404 });
   }
 
@@ -133,11 +146,11 @@ export async function POST(request: Request) {
   try {
     return await calculateWithSuperFrete(destinationCep);
   } catch (error) {
-    console.error("[frete] Falha inesperada ao consultar a SuperFrete", {
+    console.error("[frete] Falha inesperada:", {
       message: error instanceof Error ? error.message : "Erro desconhecido"
     });
     return NextResponse.json(
-      { error: "Erro ao consultar a SuperFrete. Tente novamente em instantes." },
+      { error: "Erro ao consultar o SuperFrete. Tente novamente em instantes." },
       { status: 502 }
     );
   }

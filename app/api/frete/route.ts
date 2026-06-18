@@ -33,10 +33,12 @@ export async function GET() {
 }
 
 async function calculateWithSuperFrete(destinationCep: string) {
-  const token = process.env.SUPERFRETE_TOKEN?.trim();
+  const rawToken = process.env.SUPERFRETE_TOKEN?.trim();
+  const token = rawToken?.replace(/^Bearer\s+/i, "");
 
   console.info("[frete] config:", {
     tokenConfigured: Boolean(token),
+    bearerPrefixRemoved: Boolean(rawToken && rawToken !== token),
     originCepConfigured: Boolean(process.env.SUPERFRETE_ORIGIN_CEP?.trim()),
     vercelEnvironment: process.env.VERCEL_ENV || "local",
     endpoint: superFreteUrl

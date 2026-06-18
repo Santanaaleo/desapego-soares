@@ -3,6 +3,7 @@ import { shippingMessage } from "@/lib/shipping";
 import type { ShippingEstimate, ShippingOption } from "@/types/shipping";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const originCep = process.env.SUPERFRETE_ORIGIN_CEP?.trim() || "04257245";
 
@@ -21,6 +22,13 @@ function cleanCep(value: unknown) {
 
 function getPrice(option: SuperFreteOption) {
   return Number(option.custom_price || option.price || 0);
+}
+
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    message: "Rota de frete ativa"
+  });
 }
 
 async function calculateWithSuperFrete(destinationCep: string) {

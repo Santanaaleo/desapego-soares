@@ -5,21 +5,17 @@ import { formatPrice } from "@/lib/formatters";
 import type { Product } from "@/types/product";
 
 export function ProductCard({ product }: { product: Product }) {
-  const imageFit =
-    product.category === "Polos"
-      ? "object-contain object-center p-1 transition duration-300 group-hover:scale-[1.01]"
-      : "object-cover object-center transition duration-300 group-hover:scale-[1.03]";
-
   return (
     <article className="group mx-auto flex h-full w-[94%] flex-col overflow-hidden rounded-md border border-neutral-200 bg-white transition hover:border-brand hover:shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
       <Link href={`/produto/${product.slug}`} className="block overflow-hidden bg-neutral-100">
-        <div className="relative h-64 w-full overflow-hidden bg-neutral-100 md:h-72 lg:h-80">
+        <div className="flex h-64 w-full items-center justify-center overflow-hidden bg-neutral-100 md:h-72 lg:h-80">
           <Image
             src={product.images[0]}
             alt={product.name}
-            fill
+            width={180}
+            height={180}
             sizes="(min-width: 768px) 33vw, 50vw"
-            className={imageFit}
+            className="h-[180px] w-[180px] object-contain object-center transition duration-300"
             unoptimized={product.images[0]?.startsWith("data:")}
           />
         </div>

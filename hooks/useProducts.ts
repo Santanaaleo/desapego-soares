@@ -25,7 +25,7 @@ function writeLocalProducts(products: Product[]) {
 }
 
 export function useProducts({ admin = false }: { admin?: boolean } = {}) {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [ready, setReady] = useState(false);
   const [hasSharedDatabase, setHasSharedDatabase] = useState(false);
 
@@ -44,7 +44,7 @@ export function useProducts({ admin = false }: { admin?: boolean } = {}) {
       } catch {
         if (active) {
           setHasSharedDatabase(false);
-          setProducts(readLocalProducts());
+          setProducts(process.env.NODE_ENV === "development" ? readLocalProducts() : []);
         }
       } finally {
         if (active) {
@@ -95,6 +95,10 @@ export function useProducts({ admin = false }: { admin?: boolean } = {}) {
       }
     }
 
+    if (!admin && process.env.NODE_ENV !== "development") {
+      throw new Error("Banco de dados indisponível.");
+    }
+
     persistLocal([fallbackProduct, ...products]);
     return fallbackProduct;
   }
@@ -119,6 +123,10 @@ export function useProducts({ admin = false }: { admin?: boolean } = {}) {
       }
     }
 
+    if (!admin && process.env.NODE_ENV !== "development") {
+      throw new Error("Banco de dados indisponível.");
+    }
+
     const nextProducts = products.map((product) =>
       product.id === id ? { ...product, ...input, updated_at: new Date().toISOString() } : product
     );
@@ -134,6 +142,10 @@ export function useProducts({ admin = false }: { admin?: boolean } = {}) {
       if (!response.ok) {
         throw new Error(data?.message || "Não foi possível excluir o produto.");
       }
+    }
+
+    if (!admin && process.env.NODE_ENV !== "development") {
+      throw new Error("Banco de dados indisponível.");
     }
 
     persistLocal(products.filter((product) => product.id !== id));

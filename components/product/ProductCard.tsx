@@ -12,10 +12,10 @@ export function ProductCard({ product }: { product: Product }) {
           <Image
             src={product.images[0]}
             alt={product.name}
-            width={260}
-            height={260}
+            width={290}
+            height={290}
             sizes="(min-width: 768px) 33vw, 50vw"
-            className="h-[260px] w-[260px] object-contain object-center transition duration-300"
+            className="h-[290px] w-[290px] object-contain object-center transition duration-300"
             unoptimized={product.images[0]?.startsWith("data:")}
           />
         </div>

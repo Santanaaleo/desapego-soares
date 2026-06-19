@@ -227,7 +227,7 @@ export default function EntregaPage() {
                 ) : null}
                 {shipping ? (
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    {shipping.options.map((option) => {
+                    {shipping.options.filter((option) => option.service.toLowerCase() !== "loggi").map((option) => {
                       const selected = option.service === shipping.selectedService;
 
                       return (

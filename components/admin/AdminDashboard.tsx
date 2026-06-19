@@ -8,7 +8,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { LogoutButton } from "./LogoutButton";
 
 export function AdminDashboard() {
-  const { products, deleteProduct, toggleProductActive, toggleProductFeatured } = useProducts();
+  const { products, deleteProduct, toggleProductActive, toggleProductFeatured } = useProducts({ admin: true });
 
   return (
     <section className="py-10 sm:py-14">

@@ -36,16 +36,7 @@ async function calculateWithSuperFrete(destinationCep: string) {
   const rawToken = process.env.SUPERFRETE_TOKEN?.trim();
   const token = rawToken?.replace(/^Bearer\s+/i, "");
 
-  console.info("[frete] config:", {
-    tokenConfigured: Boolean(token),
-    bearerPrefixRemoved: Boolean(rawToken && rawToken !== token),
-    originCepConfigured: Boolean(process.env.SUPERFRETE_ORIGIN_CEP?.trim()),
-    vercelEnvironment: process.env.VERCEL_ENV || "local",
-    endpoint: superFreteUrl
-  });
-
   if (!token) {
-    console.error("[frete] SUPERFRETE_TOKEN ausente no ambiente do servidor.");
     return NextResponse.json(
       { error: "A consulta de frete está temporariamente indisponível." },
       { status: 503 }
@@ -70,8 +61,6 @@ async function calculateWithSuperFrete(destinationCep: string) {
     }
   };
 
-  console.info("[frete] payload:", payload);
-
   const response = await fetch(superFreteUrl, {
     method: "POST",
     headers: {
@@ -93,10 +82,8 @@ async function calculateWithSuperFrete(destinationCep: string) {
     data = null;
   }
 
-  console.info("[frete] status:", response.status);
-
   if (!response.ok || !Array.isArray(data)) {
-    console.error("[frete] response:", data ?? responseText);
+    console.error("[frete] Falha na consulta ao provedor.");
     return NextResponse.json(
       { error: "Não foi possível consultar o SuperFrete. Tente novamente em instantes." },
       { status: response.status || 502 }
@@ -123,7 +110,7 @@ async function calculateWithSuperFrete(destinationCep: string) {
     .filter(Boolean) as ShippingOption[];
 
   if (!options.length) {
-    console.error("[frete] response:", data);
+    console.error("[frete] Nenhuma modalidade disponível.");
     return NextResponse.json({ error: "Nenhuma modalidade de frete disponível para este CEP." }, { status: 404 });
   }
 

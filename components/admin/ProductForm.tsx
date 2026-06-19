@@ -24,6 +24,7 @@ export function ProductForm({ product, onSubmit }: Props) {
   const [featured, setFeatured] = useState(product?.featured || false);
   const [active, setActive] = useState(product?.active ?? true);
   const [images, setImages] = useState(product?.images || []);
+  const [error, setError] = useState("");
 
   const slug = useMemo(() => slugify(name), [name]);
 
@@ -34,12 +35,25 @@ export function ProductForm({ product, onSubmit }: Props) {
       .split(",")
       .map((size) => size.trim())
       .filter(Boolean);
+    const numericPrice = Number(price);
+
+    if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
+      setError("Informe um preço maior que zero.");
+      return;
+    }
+
+    if (!slug) {
+      setError("Informe um nome válido para gerar o slug do produto.");
+      return;
+    }
+
+    setError("");
 
     onSubmit({
       name,
       slug,
       description,
-      price: Number(price),
+      price: numericPrice,
       category,
       brand,
       sizes,
@@ -104,6 +118,7 @@ export function ProductForm({ product, onSubmit }: Props) {
         </label>
       </div>
       <ImageUpload images={images} onChange={setImages} />
+      {error ? <p className="text-sm font-bold text-red-600">{error}</p> : null}
       <Button type="submit">{product ? "Salvar alteracoes" : "Cadastrar produto"}</Button>
     </form>
   );

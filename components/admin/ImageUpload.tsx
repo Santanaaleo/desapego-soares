@@ -2,7 +2,7 @@
 
 import { Upload, X } from "lucide-react";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 
 type Props = {
@@ -10,23 +10,43 @@ type Props = {
   onChange: (images: string[]) => void;
 };
 
-function fileToDataUrl(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-}
-
 export function ImageUpload({ images, onChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleFiles(files: FileList | null) {
     if (!files?.length) return;
 
-    const urls = await Promise.all(Array.from(files).map(fileToDataUrl));
-    onChange([...images, ...urls]);
+    setUploading(true);
+    setError("");
+
+    try {
+      const urls = await Promise.all(
+        Array.from(files).map(async (file) => {
+          const formData = new FormData();
+          formData.append("file", file);
+
+          const response = await fetch("/api/admin/product-images", {
+            method: "POST",
+            body: formData
+          });
+          const data = (await response.json().catch(() => null)) as { url?: string; message?: string } | null;
+
+          if (!response.ok || !data?.url) {
+            throw new Error(data?.message || "Não foi possível enviar a imagem.");
+          }
+
+          return data.url;
+        })
+      );
+
+      onChange([...images, ...urls]);
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "Não foi possível enviar a imagem.");
+    } finally {
+      setUploading(false);
+    }
 
     if (inputRef.current) {
       inputRef.current.value = "";
@@ -46,20 +66,20 @@ export function ImageUpload({ images, onChange }: Props) {
       <label className="focus-within:outline-brand grid cursor-pointer gap-3 rounded-md border border-dashed border-neutral-300 p-5 text-center">
         <Upload className="mx-auto text-brand" size={24} />
         <span className="text-sm font-bold text-neutral-800">
-          {images.length ? "Trocar ou adicionar imagem" : "Enviar imagens do produto"}
+          {uploading ? "Enviando imagem..." : images.length ? "Trocar ou adicionar imagem" : "Enviar imagens do produto"}
         </span>
-        <span className="text-xs text-neutral-500">
-          Mock funcional em Data URL. Quando o Supabase estiver configurado, o mesmo campo fica preparado para Storage.
-        </span>
+        <span className="text-xs text-neutral-500">As imagens serão salvas no Supabase Storage.</span>
         <input
           ref={inputRef}
           type="file"
           accept="image/*"
           multiple
+          disabled={uploading}
           className="sr-only"
           onChange={(event) => handleFiles(event.target.files)}
         />
       </label>
+      {error ? <p className="text-sm font-bold text-red-600">{error}</p> : null}
 
       {images.length ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

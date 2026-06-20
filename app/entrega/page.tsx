@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 import { CreditCard } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
@@ -145,7 +145,9 @@ export default function EntregaPage() {
     setSubmitError("");
   }
 
-  async function payOnline() {
+  async function payOnline(event?: FormEvent) {
+    event?.preventDefault();
+
     if (!items.length) return;
 
     if (!selectedShipping || !shipping) {
@@ -220,7 +222,7 @@ export default function EntregaPage() {
             </Button>
           </div>
         ) : (
-          <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+          <form onSubmit={payOnline} className="grid gap-6 lg:grid-cols-[1fr_360px]">
             <div className="grid gap-5">
               <div className="rounded-md border border-neutral-200 bg-white p-5">
                 <h2 className="font-display text-xl font-black uppercase text-neutral-950">Cliente</h2>
@@ -326,7 +328,7 @@ export default function EntregaPage() {
                 </div>
               </div>
               {submitError ? <p className="mt-4 text-sm font-semibold text-red-600">{submitError}</p> : null}
-              <Button type="button" className="mt-6 w-full gap-2" onClick={payOnline} disabled={loadingPayment}>
+              <Button type="submit" className="mt-6 w-full gap-2" disabled={loadingPayment}>
                 <CreditCard size={18} />
                 {loadingPayment ? "Gerando pagamento..." : "Finalizar com Pix ou Cartão"}
               </Button>
@@ -334,7 +336,7 @@ export default function EntregaPage() {
                 Voltar para sacola
               </Link>
             </aside>
-          </div>
+          </form>
         )}
       </Container>
     </section>

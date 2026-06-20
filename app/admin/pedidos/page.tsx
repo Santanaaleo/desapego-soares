@@ -40,10 +40,11 @@ function isSameDay(date: Date, comparison: Date) {
 function getStats(orders: Order[]) {
   const today = new Date();
   const todayOrders = orders.filter((order) => isSameDay(new Date(order.created_at), today));
+  const billableTodayOrders = todayOrders.filter((order) => ["paid", "shipped", "delivered"].includes(order.status));
 
   return {
     ordersToday: todayOrders.length,
-    revenueToday: todayOrders.reduce((sum, order) => sum + Number(order.total), 0),
+    revenueToday: billableTodayOrders.reduce((sum, order) => sum + Number(order.total), 0),
     pendingOrders: orders.filter((order) => order.status === "pending").length,
     paidOrders: orders.filter((order) => order.status === "paid").length
   };

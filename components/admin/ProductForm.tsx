@@ -79,7 +79,7 @@ export function ProductForm({ product, onSubmit }: Props) {
           required
           value={price}
           onChange={(event) => setPrice(event.target.value)}
-          placeholder="Preco"
+          placeholder="Preço"
           inputMode="decimal"
         />
         <select
@@ -92,25 +92,25 @@ export function ProductForm({ product, onSubmit }: Props) {
           ))}
         </select>
         <Input value={brand} onChange={(event) => setBrand(event.target.value)} placeholder="Marca" />
-        <Input value={condition} onChange={(event) => setCondition(event.target.value)} placeholder="Condicao" />
+        <Input value={condition} onChange={(event) => setCondition(event.target.value)} placeholder="Condição" />
       </div>
 
       <div className="grid gap-3">
-        <p className="text-sm font-black uppercase text-neutral-950">Tamanhos disponiveis</p>
+        <p className="text-sm font-black uppercase text-neutral-950">Tamanhos disponíveis</p>
         <Input
           value={sizesText}
           onChange={(event) => setSizesText(event.target.value)}
           placeholder="Ex: P, M, G, GG ou 38, 39, 40, 41"
         />
         <p className="text-xs font-bold text-neutral-500">
-          Separe por virgula. Deixe vazio para produtos sem tamanho, como oculos.
+          Separe por vírgula. Deixe vazio para produtos sem tamanho, como óculos.
         </p>
       </div>
 
       <textarea
         value={description}
         onChange={(event) => setDescription(event.target.value)}
-        placeholder="Descricao"
+        placeholder="Descrição"
         className="focus-ring min-h-28 rounded-md border border-neutral-200 p-4 text-sm"
       />
       <div className="flex flex-wrap gap-4">
@@ -125,7 +125,7 @@ export function ProductForm({ product, onSubmit }: Props) {
       </div>
       <ImageUpload images={images} onChange={setImages} />
       {error ? <p className="text-sm font-bold text-red-600">{error}</p> : null}
-      <Button type="submit">{product ? "Salvar alteracoes" : "Cadastrar produto"}</Button>
+      <Button type="submit">{product ? "Salvar alterações" : "Cadastrar produto"}</Button>
     </form>
   );
 }

@@ -32,8 +32,7 @@ const initialForm: CheckoutData = {
   street: "",
   number: "",
   complement: "",
-  document: "",
-  coupon: ""
+  document: ""
 };
 
 function isShippingEstimate(value: ShippingEstimate | { error?: string }): value is ShippingEstimate {
@@ -253,15 +252,9 @@ export default function EntregaPage() {
                 </div>
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div className="rounded-md border border-neutral-200 bg-white p-5">
-                  <h2 className="font-display text-xl font-black uppercase text-neutral-950">Nota fiscal</h2>
-                  <Input required className="mt-4" value={form.document} onChange={(event) => updateField("document", event.target.value)} placeholder="CPF ou CNPJ" />
-                </div>
-                <div className="rounded-md border border-neutral-200 bg-white p-5">
-                  <h2 className="font-display text-xl font-black uppercase text-neutral-950">Cupom</h2>
-                  <Input className="mt-4" value={form.coupon} onChange={(event) => updateField("coupon", event.target.value)} placeholder="Código promocional" />
-                </div>
+              <div className="rounded-md border border-neutral-200 bg-white p-5">
+                <h2 className="font-display text-xl font-black uppercase text-neutral-950">Nota fiscal</h2>
+                <Input required className="mt-4" value={form.document} onChange={(event) => updateField("document", event.target.value)} placeholder="CPF ou CNPJ" />
               </div>
 
               <div className="rounded-md border border-neutral-200 bg-neutral-50 p-5">

@@ -45,11 +45,11 @@ export function ProductDetails({ product }: { product: Product }) {
 
       <div className="grid gap-2 border-y border-neutral-200 py-4 text-sm">
         <p>
-          <strong>Condicao:</strong> {product.condition}
+          <strong>Condição:</strong> {product.condition}
         </p>
         {availableSizes.length ? (
           <p>
-            <strong>Tamanhos disponiveis:</strong> {availableSizes.join(", ")}
+            <strong>Tamanhos disponíveis:</strong> {availableSizes.join(", ")}
           </p>
         ) : null}
       </div>

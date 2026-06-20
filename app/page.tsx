@@ -36,7 +36,7 @@ export default function Home() {
               Produtos originais para quem vive o corre
             </h1>
             <p className="mt-2.5 max-w-xl text-[13px] font-medium leading-5 text-white/85 sm:mt-3 sm:text-base sm:leading-6">
-              Confira as peças disponíveis e chame no WhatsApp para fechar seu pedido.
+              Confira as peças disponíveis e finalize com Pix ou cartão pelo checkout seguro.
             </p>
             <div className="mt-3.5 flex flex-col gap-3 sm:mt-5 sm:flex-row">
               <Button href="/catalogo" className="h-10 gap-2 px-4 text-xs sm:h-11 sm:px-5 sm:text-sm">

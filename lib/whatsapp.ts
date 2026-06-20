@@ -38,10 +38,7 @@ export function buildWhatsAppMessage(items: CartItem[], checkout?: CheckoutData,
         `Complemento: ${checkout.complement || "Não informado"}`,
         "",
         "Nota fiscal:",
-        `CPF/CNPJ: ${checkout.document}`,
-        "",
-        "Cupom:",
-        `Código promocional: ${checkout.coupon || "Não informado"}`
+        `CPF/CNPJ: ${checkout.document}`
       ]
     : [];
 

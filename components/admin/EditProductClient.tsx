@@ -39,7 +39,7 @@ export function EditProductClient({ id }: { id: string }) {
   return (
     <section className="py-10 sm:py-14">
       <Container className="max-w-4xl">
-        <h1 className="mb-8 font-display text-4xl font-black text-neutral-950">Editar Produto</h1>
+        <h1 className="mb-8 font-display text-4xl font-black text-neutral-950">Editar produto</h1>
         {error ? <p className="mb-4 text-sm font-bold text-red-600">{error}</p> : null}
         <ProductForm product={product} onSubmit={handleSubmit} />
       </Container>

@@ -2,7 +2,7 @@ import { formatPrice } from "@/lib/formatters";
 import type { ShippingEstimate, ShippingOption } from "@/types/shipping";
 
 export const shippingStorageKey = "desapego-soares-shipping-estimate";
-export const shippingMessage = "Frete estimado. Valor final confirmado no WhatsApp.";
+export const shippingMessage = "Frete estimado conforme a modalidade escolhida.";
 
 export function normalizeCep(value: string) {
   return value.replace(/\D/g, "");

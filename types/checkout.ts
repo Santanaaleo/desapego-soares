@@ -11,5 +11,4 @@ export type CheckoutData = {
   number: string;
   complement: string;
   document: string;
-  coupon: string;
 };

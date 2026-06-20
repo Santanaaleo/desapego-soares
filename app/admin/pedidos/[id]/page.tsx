@@ -142,7 +142,7 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
 
             <form action={updateStatus} className="mt-6 grid gap-3 border-t border-neutral-200 pt-5">
               <label className="text-xs font-black uppercase text-neutral-500" htmlFor="status">
-                Alterar status
+                Alterar situação
               </label>
               <select
                 id="status"
@@ -156,12 +156,12 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
                   </option>
                 ))}
               </select>
-              <Button type="submit">Salvar status</Button>
+              <Button type="submit">Salvar situação</Button>
             </form>
 
             <form action={updateTrackingCode} className="mt-6 grid gap-3 border-t border-neutral-200 pt-5">
               <label className="text-xs font-black uppercase text-neutral-500" htmlFor="tracking_code">
-                Código de rastreio
+                Código de Rastreio
               </label>
               <input
                 id="tracking_code"

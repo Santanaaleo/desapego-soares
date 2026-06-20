@@ -38,7 +38,7 @@ export function CartSummary({ items, total }: { items: CartItem[]; total: number
         </Button>
       )}
       <p className="mt-4 text-xs font-bold leading-5 text-neutral-600">
-        O pedido sera enviado como mensagem. Nao ha checkout, pagamento online ou PIX integrado.
+        Você poderá finalizar com Pix ou cartão na próxima etapa.
       </p>
     </aside>
   );

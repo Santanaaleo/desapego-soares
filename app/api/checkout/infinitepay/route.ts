@@ -64,7 +64,6 @@ export async function POST(request: Request) {
 
   const handle = process.env.INFINITEPAY_HANDLE?.trim();
 
-  console.info("[infinitepay:diagnostic] handle =", process.env.INFINITEPAY_HANDLE);
   console.info("[infinitepay:diagnostic] INFINITEPAY_HANDLE encontrado:", Boolean(handle));
 
   if (!handle) {
@@ -224,11 +223,8 @@ export async function POST(request: Request) {
     redirect_url: redirectUrl
   };
 
-  console.info("[infinitepay:diagnostic] payload handle =", payload.handle);
-
   console.info("[infinitepay:diagnostic] Payload sanitizado enviado:", {
     endpoint: infinitePayUrl,
-    handle: payload.handle,
     handle_found: Boolean(handle),
     handle_length: handle.length,
     order_nsu: payload.order_nsu,

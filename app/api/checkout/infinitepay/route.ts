@@ -99,7 +99,7 @@ export async function POST(request: Request) {
   ) {
     return badRequest("Endereço incompleto.");
   }
-  if (!shipping || !clean(shipping.service) || !Number.isFinite(shipping.price) || Number(shipping.price) < 0) {
+  if (!shipping || !clean(shipping.service) || !Number.isFinite(shipping.price) || Number(shipping.price) <= 0) {
     return badRequest("Frete inválido.");
   }
 
@@ -195,11 +195,18 @@ export async function POST(request: Request) {
   const payload = {
     handle,
     order_nsu: order.order_nsu,
-    items: orderItems.map((item) => ({
-      quantity: item.quantity,
-      price: cents(item.unit_price),
-      description: item.product_name
-    })),
+    items: [
+      ...orderItems.map((item) => ({
+        quantity: item.quantity,
+        price: cents(item.unit_price),
+        description: item.product_name
+      })),
+      {
+        quantity: 1,
+        price: cents(shippingPrice),
+        description: `Frete ${clean(shipping.service)}`
+      }
+    ],
     customer: {
       name: `${clean(customer.firstName)} ${clean(customer.lastName)}`,
       email: clean(customer.email),

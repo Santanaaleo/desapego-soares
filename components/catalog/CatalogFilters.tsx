@@ -19,14 +19,32 @@ export function CatalogFilters({
   const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState(initialCategory);
 
+  function normalize(value: string) {
+    return value
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+  }
+
   const filtered = useMemo(() => {
+    const normalizedQuery = normalize(query);
+
     return products.filter((product) => {
-      const text = `${product.name} ${product.brand} ${product.category} ${product.description}`.toLowerCase();
-      const matchesQuery = text.includes(query.toLowerCase());
+      const text = normalize(`${product.name} ${product.brand} ${product.category} ${product.description}`);
+      const matchesQuery = !normalizedQuery || text.includes(normalizedQuery);
       const matchesCategory = category === "Todos" || product.category === category;
       return matchesQuery && matchesCategory;
     });
   }, [category, products, query]);
+
+  function updateQuery(value: string) {
+    setQuery(value);
+
+    if (category !== "Todos") {
+      setCategory("Todos");
+    }
+  }
 
   return (
     <div className="grid gap-5">
@@ -35,7 +53,7 @@ export function CatalogFilters({
           <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
           <Input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => updateQuery(event.target.value)}
             placeholder="Pesquisar produto, marca ou categoria"
             className="pl-11"
           />

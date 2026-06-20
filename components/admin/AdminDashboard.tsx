@@ -19,6 +19,9 @@ export function AdminDashboard() {
             <h1 className="mt-2 font-display text-4xl font-black text-neutral-950 sm:text-5xl">Produtos</h1>
           </div>
           <div className="flex flex-wrap gap-3">
+            <Button href="/admin/pedidos" variant="secondary">
+              Pedidos
+            </Button>
             <Button href="/admin/produtos/novo" className="gap-2">
               <Plus size={18} />
               Novo Produto

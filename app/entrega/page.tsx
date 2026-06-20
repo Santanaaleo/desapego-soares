@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { type FormEvent, useMemo, useState } from "react";
-import { MessageCircle } from "lucide-react";
+import { CreditCard, MessageCircle } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -47,6 +47,7 @@ export default function EntregaPage() {
   const [cepStatus, setCepStatus] = useState("");
   const [loadingCep, setLoadingCep] = useState(false);
   const [loadingShipping, setLoadingShipping] = useState(false);
+  const [loadingPayment, setLoadingPayment] = useState(false);
   const [shippingError, setShippingError] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [shipping, setShipping] = useState<ShippingEstimate | null>(null);
@@ -156,6 +157,63 @@ export default function EntregaPage() {
     }
 
     window.open(buildWhatsAppUrl(items, form, shipping), "_blank", "noopener,noreferrer");
+  }
+
+  async function payOnline() {
+    if (!items.length) return;
+
+    if (!selectedShipping || !shipping) {
+      setSubmitError("Escolha uma forma de entrega antes de pagar pelo site.");
+      return;
+    }
+
+    setLoadingPayment(true);
+    setSubmitError("");
+
+    try {
+      const response = await fetch("/api/checkout/infinitepay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: items.map((item) => ({
+            productId: item.product.id,
+            size: item.size,
+            quantity: item.quantity
+          })),
+          customer: {
+            firstName: form.firstName,
+            lastName: form.lastName,
+            phone: form.phone,
+            email: form.email
+          },
+          address: {
+            cep: form.cep,
+            city: form.city,
+            state: form.state,
+            neighborhood: form.neighborhood,
+            street: form.street,
+            number: form.number,
+            complement: form.complement
+          },
+          shipping: {
+            service: selectedShipping.service,
+            price: selectedShipping.price
+          }
+        })
+      });
+      const data = (await response.json()) as { checkout_url?: string; link?: string; error?: string };
+
+      if (!response.ok || (!data.checkout_url && !data.link)) {
+        setSubmitError(data.error || "Não foi possível iniciar o pagamento online.");
+        return;
+      }
+
+      window.location.href = data.checkout_url || data.link || "";
+    } catch {
+      setSubmitError("Não foi possível iniciar o pagamento online.");
+    } finally {
+      setLoadingPayment(false);
+    }
   }
 
   return (
@@ -285,6 +343,10 @@ export default function EntregaPage() {
               <Button type="submit" className="mt-6 w-full gap-2">
                 <MessageCircle size={18} />
                 Finalizar no WhatsApp
+              </Button>
+              <Button type="button" className="mt-3 w-full gap-2" onClick={payOnline} disabled={loadingPayment}>
+                <CreditCard size={18} />
+                {loadingPayment ? "Gerando pagamento..." : "Pagar pelo site"}
               </Button>
               <Link href="/carrinho" className="mt-4 inline-block text-sm font-bold text-brand hover:text-brand-secondary">
                 Voltar para sacola

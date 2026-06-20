@@ -42,6 +42,19 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
   return data as Order;
 }
 
+export async function updateOrderTrackingCode(id: string, trackingCode: string | null) {
+  if (!supabaseAdmin) return null;
+
+  const { data, error } = await supabaseAdmin
+    .from(ordersTable)
+    .update({ tracking_code: trackingCode, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select("*")
+    .single();
+  if (error) throw error;
+  return data as Order;
+}
+
 export async function markOrderPaidByOrderNsu(input: {
   orderNsu: string;
   transactionNsu?: string | null;

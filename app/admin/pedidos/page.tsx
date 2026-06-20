@@ -5,7 +5,22 @@ import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/formatters";
 import { requireAdmin } from "@/lib/admin-server";
 import { listOrdersForAdmin } from "@/lib/supabase/orders";
-import { formatOrderNumber, orderStatusBadgeClasses, orderStatusLabels } from "@/types/order";
+import { formatOrderNumber, orderStatusBadgeClasses, orderStatusLabels, type Order, type OrderStatus } from "@/types/order";
+
+type Props = {
+  searchParams?: Promise<{
+    status?: string;
+  }>;
+};
+
+const statusFilters: { label: string; value: "all" | OrderStatus }[] = [
+  { label: "Todos", value: "all" },
+  { label: "Pendente", value: "pending" },
+  { label: "Pago", value: "paid" },
+  { label: "Enviado", value: "shipped" },
+  { label: "Entregue", value: "delivered" },
+  { label: "Cancelado", value: "cancelled" }
+];
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("pt-BR", {
@@ -14,10 +29,35 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-export default async function AdminPedidosPage() {
+function isSameDay(date: Date, comparison: Date) {
+  return (
+    date.getFullYear() === comparison.getFullYear() &&
+    date.getMonth() === comparison.getMonth() &&
+    date.getDate() === comparison.getDate()
+  );
+}
+
+function getStats(orders: Order[]) {
+  const today = new Date();
+  const todayOrders = orders.filter((order) => isSameDay(new Date(order.created_at), today));
+
+  return {
+    ordersToday: todayOrders.length,
+    revenueToday: todayOrders.reduce((sum, order) => sum + Number(order.total), 0),
+    pendingOrders: orders.filter((order) => order.status === "pending").length,
+    paidOrders: orders.filter((order) => order.status === "paid").length
+  };
+}
+
+export default async function AdminPedidosPage({ searchParams }: Props) {
   await requireAdmin("/admin/pedidos");
 
+  const params = await searchParams;
+  const selectedStatus = statusFilters.some((filter) => filter.value === params?.status) ? params?.status : "all";
   const orders = await listOrdersForAdmin();
+  const allOrders = orders ?? [];
+  const filteredOrders = selectedStatus === "all" ? allOrders : allOrders.filter((order) => order.status === selectedStatus);
+  const stats = getStats(allOrders);
 
   return (
     <section className="py-10 sm:py-14">
@@ -34,13 +74,51 @@ export default async function AdminPedidosPage() {
           </div>
         </div>
 
-        {!orders?.length ? (
+        <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-md border border-neutral-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase text-neutral-500">Pedidos hoje</p>
+            <p className="mt-2 font-display text-3xl font-black text-neutral-950">{stats.ordersToday}</p>
+          </div>
+          <div className="rounded-md border border-neutral-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase text-neutral-500">Faturamento hoje</p>
+            <p className="mt-2 font-display text-3xl font-black text-neutral-950">{formatPrice(stats.revenueToday)}</p>
+          </div>
+          <div className="rounded-md border border-neutral-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase text-neutral-500">Pedidos pendentes</p>
+            <p className="mt-2 font-display text-3xl font-black text-neutral-950">{stats.pendingOrders}</p>
+          </div>
+          <div className="rounded-md border border-neutral-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase text-neutral-500">Pedidos pagos</p>
+            <p className="mt-2 font-display text-3xl font-black text-neutral-950">{stats.paidOrders}</p>
+          </div>
+        </div>
+
+        <div className="mb-5 flex flex-wrap gap-2">
+          {statusFilters.map((filter) => {
+            const active = selectedStatus === filter.value;
+            const href = filter.value === "all" ? "/admin/pedidos" : `/admin/pedidos?status=${filter.value}`;
+
+            return (
+              <Link
+                key={filter.value}
+                href={href}
+                className={`focus-ring rounded-full px-4 py-2 text-xs font-black uppercase transition ${
+                  active ? "bg-brand text-white" : "bg-white text-neutral-700 ring-1 ring-neutral-200 hover:text-brand"
+                }`}
+              >
+                {filter.label}
+              </Link>
+            );
+          })}
+        </div>
+
+        {!filteredOrders.length ? (
           <div className="rounded-md border border-dashed border-neutral-300 p-10 text-center">
             <p className="font-bold text-neutral-700">Nenhum pedido encontrado.</p>
           </div>
         ) : (
           <div className="overflow-hidden rounded-md border border-neutral-100 bg-white shadow-sm">
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <Link
                 key={order.id}
                 href={`/admin/pedidos/${order.id}`}

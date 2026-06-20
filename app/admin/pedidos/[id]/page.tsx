@@ -7,7 +7,7 @@ import { formatPrice } from "@/lib/formatters";
 import { requireAdmin } from "@/lib/admin-server";
 import { getOrderForAdmin } from "@/lib/supabase/orders";
 import { formatOrderNumber, orderStatusBadgeClasses, orderStatusLabels, type OrderStatus } from "@/types/order";
-import { updateOrderStatusAction } from "./actions";
+import { updateOrderStatusAction, updateOrderTrackingCodeAction } from "./actions";
 
 const statuses: OrderStatus[] = ["pending", "paid", "shipped", "delivered", "cancelled"];
 
@@ -38,6 +38,7 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
   }
 
   const updateStatus = updateOrderStatusAction.bind(null, order.id);
+  const updateTrackingCode = updateOrderTrackingCodeAction.bind(null, order.id);
 
   return (
     <section className="py-10 sm:py-14">
@@ -154,6 +155,21 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
                 ))}
               </select>
               <Button type="submit">Salvar status</Button>
+            </form>
+
+            <form action={updateTrackingCode} className="mt-6 grid gap-3 border-t border-neutral-200 pt-5">
+              <label className="text-xs font-black uppercase text-neutral-500" htmlFor="tracking_code">
+                Código de rastreio
+              </label>
+              <input
+                id="tracking_code"
+                name="tracking_code"
+                defaultValue={order.tracking_code || ""}
+                placeholder="Informe o código"
+                className="focus-ring h-11 rounded-md border border-neutral-200 bg-white px-3 text-sm font-semibold"
+              />
+              {order.tracking_code ? <p className="text-sm font-bold text-neutral-700">Atual: {order.tracking_code}</p> : null}
+              <Button type="submit">Salvar rastreio</Button>
             </form>
           </aside>
         </div>

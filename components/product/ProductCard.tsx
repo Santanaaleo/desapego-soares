@@ -15,7 +15,7 @@ export function ProductCard({ product }: { product: Product }) {
             width={290}
             height={290}
             sizes="(min-width: 768px) 33vw, 50vw"
-            className="h-[290px] w-[290px] object-contain object-center transition duration-300"
+            className="h-[220px] w-[220px] object-contain object-center transition duration-300 sm:h-[260px] sm:w-[260px] md:h-[290px] md:w-[290px]"
             unoptimized={product.images[0]?.startsWith("data:")}
           />
         </div>

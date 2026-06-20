@@ -8,13 +8,13 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
 
   return (
     <div className="grid gap-4">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-brand-mist">
+      <div className="relative mx-auto aspect-square max-h-[520px] w-full max-w-[520px] overflow-hidden rounded-md bg-brand-mist sm:aspect-[4/5]">
         <Image
           src={selected}
           alt={name}
           fill
-          sizes="(min-width: 1024px) 50vw, 100vw"
-          className="object-contain object-center p-4"
+          sizes="(min-width: 1024px) 520px, 100vw"
+          className="object-contain object-center p-5 sm:p-6"
           priority
           unoptimized={selected.startsWith("data:")}
         />

@@ -7,6 +7,8 @@ import { hasSupabaseConfig } from "@/lib/supabase/client";
 import { getActiveProductBySlug, listActiveProductSlugs } from "@/lib/supabase/products";
 
 export const dynamicParams = true;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateStaticParams() {
   const sharedSlugs = await listActiveProductSlugs().catch(() => null);
@@ -15,9 +17,13 @@ export async function generateStaticParams() {
     return sharedSlugs.map((product) => ({ slug: product.slug }));
   }
 
-  return getProducts()
-    .filter((product) => product.active)
-    .map((product) => ({ slug: product.slug }));
+  if (!hasSupabaseConfig()) {
+    return getProducts()
+      .filter((product) => product.active)
+      .map((product) => ({ slug: product.slug }));
+  }
+
+  return [];
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {

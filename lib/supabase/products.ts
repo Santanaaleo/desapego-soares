@@ -61,7 +61,14 @@ export async function listActiveProducts() {
 export async function getActiveProductBySlug(slug: string) {
   if (!supabase) return null;
 
-  const { data, error } = await supabase.from(table).select("*").eq("slug", slug).eq("active", true).maybeSingle();
+  const { data, error } = await supabase
+    .from(table)
+    .select("*")
+    .eq("slug", slug)
+    .eq("active", true)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
   if (error) throw error;
   return data as Product | null;
 }

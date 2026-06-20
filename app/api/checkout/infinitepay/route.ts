@@ -51,6 +51,10 @@ function money(value: number) {
   return Math.round(value * 100) / 100;
 }
 
+function cents(value: number) {
+  return Math.round(value * 100);
+}
+
 const redirectUrl = "https://desapego-soares.vercel.app/pagamento/sucesso";
 
 export async function POST(request: Request) {
@@ -194,9 +198,9 @@ export async function POST(request: Request) {
     items: orderItems.map((item) => ({
       name: item.product_name,
       quantity: item.quantity,
-      unit_price: item.unit_price,
-      price: item.unit_price,
-      amount: item.subtotal
+      unit_price: cents(item.unit_price),
+      price: cents(item.unit_price),
+      amount: cents(item.subtotal)
     })),
     customer: {
       name: `${clean(customer.firstName)} ${clean(customer.lastName)}`,

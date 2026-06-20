@@ -10,6 +10,98 @@ type Props = {
   onChange: (images: string[]) => void;
 };
 
+function loadImage(file: File) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const image = new window.Image();
+
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Não foi possível ler a imagem."));
+    };
+    image.src = url;
+  });
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement) {
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+        return;
+      }
+
+      reject(new Error("Não foi possível processar a imagem."));
+    }, "image/png");
+  });
+}
+
+async function trimTransparentPng(file: File) {
+  if (file.type !== "image/png") {
+    return file;
+  }
+
+  const image = await loadImage(file);
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+
+  if (!context) {
+    return file;
+  }
+
+  canvas.width = image.naturalWidth;
+  canvas.height = image.naturalHeight;
+  context.drawImage(image, 0, 0);
+
+  const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height);
+  let top = height;
+  let right = 0;
+  let bottom = 0;
+  let left = width;
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const alpha = data[(y * width + x) * 4 + 3];
+
+      if (alpha > 0) {
+        top = Math.min(top, y);
+        right = Math.max(right, x);
+        bottom = Math.max(bottom, y);
+        left = Math.min(left, x);
+      }
+    }
+  }
+
+  if (left > right || top > bottom) {
+    return file;
+  }
+
+  const trimmedWidth = right - left + 1;
+  const trimmedHeight = bottom - top + 1;
+
+  if (trimmedWidth === width && trimmedHeight === height) {
+    return file;
+  }
+
+  const trimmedCanvas = document.createElement("canvas");
+  const trimmedContext = trimmedCanvas.getContext("2d");
+
+  if (!trimmedContext) {
+    return file;
+  }
+
+  trimmedCanvas.width = trimmedWidth;
+  trimmedCanvas.height = trimmedHeight;
+  trimmedContext.drawImage(canvas, left, top, trimmedWidth, trimmedHeight, 0, 0, trimmedWidth, trimmedHeight);
+
+  const blob = await canvasToBlob(trimmedCanvas);
+  return new File([blob], file.name, { type: "image/png", lastModified: file.lastModified });
+}
+
 export function ImageUpload({ images, onChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -24,8 +116,9 @@ export function ImageUpload({ images, onChange }: Props) {
     try {
       const urls = await Promise.all(
         Array.from(files).map(async (file) => {
+          const uploadFile = await trimTransparentPng(file);
           const formData = new FormData();
-          formData.append("file", file);
+          formData.append("file", uploadFile);
 
           const response = await fetch("/api/admin/product-images", {
             method: "POST",

@@ -13,7 +13,6 @@ export type Product = {
   featured: boolean;
   active: boolean;
   images: string[];
-  imageZoom?: number;
   created_at: string;
   updated_at: string;
 };

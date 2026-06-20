@@ -11,14 +11,9 @@ create table if not exists products (
   featured boolean default false,
   active boolean default true,
   images text[] default '{}',
-  imageZoom integer default 100 check (imageZoom in (100, 110, 120, 130, 140)),
   created_at timestamp with time zone default now(),
   updated_at timestamp with time zone default now()
 );
-
-alter table products add column if not exists imageZoom integer default 100;
-alter table products drop constraint if exists products_imageZoom_check;
-alter table products add constraint products_imageZoom_check check (imageZoom in (100, 110, 120, 130, 140));
 
 create index if not exists products_category_idx on products (category);
 create index if not exists products_featured_idx on products (featured);

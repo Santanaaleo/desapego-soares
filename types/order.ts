@@ -1,5 +1,17 @@
 export type OrderStatus = "pending" | "paid" | "shipped" | "delivered" | "cancelled";
 
+export const orderStatusLabels: Record<OrderStatus, string> = {
+  pending: "Pendente",
+  paid: "Pago",
+  shipped: "Enviado",
+  delivered: "Entregue",
+  cancelled: "Cancelado"
+};
+
+export function formatOrderNumber(orderNumber: number | null | undefined) {
+  return orderNumber ? `#${orderNumber.toString().padStart(6, "0")}` : "#------";
+}
+
 export type OrderItem = {
   id: string;
   order_id: string;
@@ -14,6 +26,7 @@ export type OrderItem = {
 
 export type Order = {
   id: string;
+  order_number: number;
   order_nsu: string | null;
   transaction_nsu: string | null;
   invoice_slug: string | null;

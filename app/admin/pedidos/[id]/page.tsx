@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/formatters";
 import { requireAdmin } from "@/lib/admin-server";
 import { getOrderForAdmin } from "@/lib/supabase/orders";
+import { formatOrderNumber, orderStatusLabels, type OrderStatus } from "@/types/order";
 import { updateOrderStatusAction } from "./actions";
 
-const statuses = ["pending", "paid", "shipped", "delivered", "cancelled"];
+const statuses: OrderStatus[] = ["pending", "paid", "shipped", "delivered", "cancelled"];
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("pt-BR", {
@@ -37,7 +38,7 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
           <div>
             <p className="text-sm font-black uppercase text-brand">Pedido</p>
             <h1 className="mt-2 font-display text-3xl font-black text-neutral-950 sm:text-4xl">
-              {order.order_nsu || order.id}
+              Pedido {formatOrderNumber(order.order_number)}
             </h1>
             <p className="mt-2 text-sm font-semibold text-neutral-500">Criado em {formatDate(order.created_at)}</p>
           </div>
@@ -110,7 +111,7 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
           <aside className="h-fit rounded-md border border-neutral-100 bg-neutral-50 p-5 shadow-sm">
             <div className="flex items-center justify-between gap-3">
               <h2 className="font-display text-xl font-black uppercase text-neutral-950">Resumo</h2>
-              <Badge>{order.status}</Badge>
+              <Badge>{orderStatusLabels[order.status]}</Badge>
             </div>
 
             <div className="mt-5 grid gap-3 text-sm text-neutral-700">
@@ -140,7 +141,7 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
               >
                 {statuses.map((status) => (
                   <option key={status} value={status}>
-                    {status}
+                    {orderStatusLabels[status]}
                   </option>
                 ))}
               </select>

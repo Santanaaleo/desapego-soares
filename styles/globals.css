@@ -48,3 +48,17 @@ textarea {
 .focus-ring {
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand;
 }
+
+@keyframes top-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-50% - 0.875rem));
+  }
+}
+
+.top-marquee {
+  animation: top-marquee 18s linear infinite;
+}

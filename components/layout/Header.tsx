@@ -43,7 +43,16 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white">
       <div className="bg-neutral-950 text-white">
-        <Container className="flex h-7 items-center gap-7 overflow-x-auto whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.16em] sm:h-8 sm:text-xs md:grid md:grid-cols-3 md:gap-4">
+        <Container className="flex h-7 items-center overflow-hidden text-[11px] font-medium uppercase tracking-[0.16em] sm:h-8 sm:text-xs md:hidden">
+          <div className="top-marquee flex min-w-max items-center gap-7 whitespace-nowrap text-white/90">
+            {[...topMessages, ...topMessages].map((message, index) => (
+              <span key={`${message}-${index}`} className="shrink-0">
+                {message}
+              </span>
+            ))}
+          </div>
+        </Container>
+        <Container className="hidden h-8 items-center gap-4 whitespace-nowrap text-xs font-medium uppercase tracking-[0.16em] md:grid md:grid-cols-3">
           {topMessages.map((message) => (
             <span key={message} className="shrink-0 text-center text-white/90">
               {message}

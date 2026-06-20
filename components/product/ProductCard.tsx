@@ -5,6 +5,8 @@ import { formatPrice } from "@/lib/formatters";
 import type { Product } from "@/types/product";
 
 export function ProductCard({ product }: { product: Product }) {
+  const imageZoom = (product.imageZoom ?? 100) / 100;
+
   return (
     <article className="group mx-auto flex h-full w-[94%] flex-col overflow-hidden rounded-md border border-neutral-200 bg-white transition hover:border-brand hover:shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
       <Link href={`/produto/${product.slug}`} className="block overflow-hidden bg-neutral-100">
@@ -16,6 +18,7 @@ export function ProductCard({ product }: { product: Product }) {
             height={290}
             sizes="(min-width: 768px) 33vw, 50vw"
             className="h-[220px] w-[220px] object-contain object-center transition duration-300 sm:h-[260px] sm:w-[260px] md:h-[290px] md:w-[290px]"
+            style={{ transform: `scale(${imageZoom})` }}
             unoptimized={product.images[0]?.startsWith("data:")}
           />
         </div>

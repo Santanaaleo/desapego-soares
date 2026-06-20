@@ -24,6 +24,7 @@ export function ProductForm({ product, onSubmit }: Props) {
   const [featured, setFeatured] = useState(product?.featured || false);
   const [active, setActive] = useState(product?.active ?? true);
   const [images, setImages] = useState(product?.images || []);
+  const [imageZoom, setImageZoom] = useState(String(product?.imageZoom ?? 100));
   const [error, setError] = useState("");
 
   const slug = useMemo(() => slugify(name), [name]);
@@ -60,6 +61,7 @@ export function ProductForm({ product, onSubmit }: Props) {
       condition,
       featured,
       active,
+      imageZoom: Number(imageZoom),
       images: images.length ? images : ["/produtos/polos/polo-3.jpeg"]
     });
   }
@@ -87,6 +89,17 @@ export function ProductForm({ product, onSubmit }: Props) {
         </select>
         <Input value={brand} onChange={(event) => setBrand(event.target.value)} placeholder="Marca" />
         <Input value={condition} onChange={(event) => setCondition(event.target.value)} placeholder="Condicao" />
+        <select
+          value={imageZoom}
+          onChange={(event) => setImageZoom(event.target.value)}
+          className="focus-ring h-11 rounded-md border border-neutral-200 bg-white px-4 text-sm"
+        >
+          {[100, 110, 120, 130, 140].map((value) => (
+            <option key={value} value={value}>
+              Zoom da imagem: {value}%
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="grid gap-3">

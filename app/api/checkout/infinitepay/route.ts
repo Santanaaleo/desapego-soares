@@ -60,6 +60,9 @@ export async function POST(request: Request) {
 
   const handle = process.env.INFINITEPAY_HANDLE?.trim();
 
+  console.info("[infinitepay:diagnostic] handle =", process.env.INFINITEPAY_HANDLE);
+  console.info("[infinitepay:diagnostic] INFINITEPAY_HANDLE encontrado:", Boolean(handle));
+
   if (!handle) {
     return NextResponse.json({ error: "INFINITEPAY_HANDLE não configurado." }, { status: 500 });
   }
@@ -212,6 +215,32 @@ export async function POST(request: Request) {
     redirect_url: redirectUrl
   };
 
+  console.info("[infinitepay:diagnostic] payload handle =", payload.handle);
+
+  console.info("[infinitepay:diagnostic] Payload sanitizado enviado:", {
+    endpoint: infinitePayUrl,
+    handle: payload.handle,
+    handle_found: Boolean(handle),
+    handle_length: handle.length,
+    order_nsu: payload.order_nsu,
+    items: payload.items,
+    customer: {
+      name_present: Boolean(payload.customer.name),
+      email_present: Boolean(payload.customer.email),
+      phone_present: Boolean(payload.customer.phone)
+    },
+    address: {
+      zip_code_present: Boolean(payload.address.zip_code),
+      street_present: Boolean(payload.address.street),
+      number_present: Boolean(payload.address.number),
+      complement_present: Boolean(payload.address.complement),
+      neighborhood_present: Boolean(payload.address.neighborhood),
+      city: payload.address.city,
+      state: payload.address.state
+    },
+    redirect_url: payload.redirect_url
+  });
+
   const infinitePayResponse = await fetch(infinitePayUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -224,6 +253,10 @@ export async function POST(request: Request) {
     url?: string;
     invoice_slug?: string;
   };
+
+  console.info("[infinitepay:diagnostic] Status HTTP InfinitePay:", infinitePayResponse.status);
+  console.info("[infinitepay:diagnostic] Resposta completa InfinitePay:", infinitePayData);
+  console.info("[infinitepay:diagnostic] Erro de validação InfinitePay:", !infinitePayResponse.ok ? infinitePayData : null);
 
   if (!infinitePayResponse.ok) {
     console.error("[infinitepay] Falha ao gerar link:", infinitePayData);

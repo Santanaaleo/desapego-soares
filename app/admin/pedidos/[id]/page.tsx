@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/layout/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { CopyTrackingCodeButton } from "@/components/admin/CopyTrackingCodeButton";
 import { formatPrice } from "@/lib/formatters";
 import { requireAdmin } from "@/lib/admin-server";
 import { getOrderForAdmin } from "@/lib/supabase/orders";
@@ -50,6 +51,7 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
               Pedido {formatOrderNumber(order.order_number)} • {orderStatusLabels[order.status]}
             </h1>
             <p className="mt-2 text-sm font-semibold text-neutral-500">Criado em {formatDate(order.created_at)}</p>
+            <p className="mt-1 text-sm font-semibold text-neutral-500">Atualizado em: {formatDate(order.updated_at)}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {order.receipt_url ? (
@@ -168,7 +170,12 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
                 placeholder="Informe o código"
                 className="focus-ring h-11 rounded-md border border-neutral-200 bg-white px-3 text-sm font-semibold"
               />
-              {order.tracking_code ? <p className="text-sm font-bold text-neutral-700">Atual: {order.tracking_code}</p> : null}
+              {order.tracking_code ? (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-md bg-white p-3 text-sm font-bold text-neutral-700">
+                  <span>{order.tracking_code}</span>
+                  <CopyTrackingCodeButton code={order.tracking_code} />
+                </div>
+              ) : null}
               <Button type="submit">Salvar rastreio</Button>
             </form>
           </aside>

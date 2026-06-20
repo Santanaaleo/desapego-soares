@@ -28,6 +28,13 @@ export function ProductForm({ product, onSubmit }: Props) {
 
   const slug = useMemo(() => slugify(name), [name]);
 
+  function parsePrice(value: string) {
+    const normalized = value.trim().replace(/\./g, "").replace(",", ".");
+    const parsed = Number(normalized);
+
+    return Number.isFinite(parsed) ? Math.round(parsed * 100) / 100 : NaN;
+  }
+
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
@@ -35,7 +42,7 @@ export function ProductForm({ product, onSubmit }: Props) {
       .split(",")
       .map((size) => size.trim())
       .filter(Boolean);
-    const numericPrice = Number(price);
+    const numericPrice = parsePrice(price);
 
     if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
       setError("Informe um preço maior que zero.");
@@ -73,8 +80,7 @@ export function ProductForm({ product, onSubmit }: Props) {
           value={price}
           onChange={(event) => setPrice(event.target.value)}
           placeholder="Preco"
-          type="number"
-          step="0.01"
+          inputMode="decimal"
         />
         <select
           value={category}

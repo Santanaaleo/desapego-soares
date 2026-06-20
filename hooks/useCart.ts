@@ -13,7 +13,7 @@ function readCart() {
   try {
     const value = window.localStorage.getItem(cartStorageKey);
     const parsed = value ? (JSON.parse(value) as CartItem[]) : [];
-    return parsed.filter((item) => item.product && item.size);
+    return parsed.filter((item) => item.product && typeof item.size === "string");
   } catch {
     return [];
   }

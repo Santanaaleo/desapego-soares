@@ -3,6 +3,7 @@ import { Container } from "@/components/layout/Container";
 import { ProductDetails } from "@/components/product/ProductDetails";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { getProducts } from "@/lib/mock-products";
+import { hasSupabaseConfig } from "@/lib/supabase/client";
 import { getActiveProductBySlug, listActiveProductSlugs } from "@/lib/supabase/products";
 
 export const dynamicParams = true;
@@ -22,7 +23,7 @@ export async function generateStaticParams() {
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const sharedProduct = await getActiveProductBySlug(slug).catch(() => null);
-  const product = sharedProduct ?? getProducts().find((item) => item.slug === slug && item.active);
+  const product = sharedProduct ?? (hasSupabaseConfig() ? null : getProducts().find((item) => item.slug === slug && item.active));
 
   if (!product) {
     notFound();

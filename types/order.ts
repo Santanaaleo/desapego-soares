@@ -8,6 +8,14 @@ export const orderStatusLabels: Record<OrderStatus, string> = {
   cancelled: "Cancelado"
 };
 
+export const orderStatusBadgeClasses: Record<OrderStatus, string> = {
+  pending: "bg-amber-100 text-amber-800",
+  paid: "bg-emerald-100 text-emerald-800",
+  shipped: "bg-sky-100 text-sky-800",
+  delivered: "bg-emerald-100 text-emerald-800",
+  cancelled: "bg-red-100 text-red-700"
+};
+
 export function formatOrderNumber(orderNumber: number | null | undefined) {
   return orderNumber ? `#${orderNumber.toString().padStart(6, "0")}` : "#------";
 }

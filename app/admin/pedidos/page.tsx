@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/formatters";
 import { requireAdmin } from "@/lib/admin-server";
 import { listOrdersForAdmin } from "@/lib/supabase/orders";
-import { formatOrderNumber, orderStatusLabels } from "@/types/order";
+import { formatOrderNumber, orderStatusBadgeClasses, orderStatusLabels } from "@/types/order";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("pt-BR", {
@@ -68,7 +68,9 @@ export default async function AdminPedidosPage() {
                   <p className="text-xs font-black uppercase text-neutral-500">Total</p>
                   <p className="font-black text-neutral-950">{formatPrice(order.total)}</p>
                 </div>
-                <Badge>{orderStatusLabels[order.status]}</Badge>
+                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase ${orderStatusBadgeClasses[order.status]}`}>
+                  {orderStatusLabels[order.status]}
+                </span>
                 <p className="text-sm font-semibold text-neutral-500">{formatDate(order.created_at)}</p>
               </Link>
             ))}

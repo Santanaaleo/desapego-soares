@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { calculateShippingWithSuperFrete, cleanCep } from "@/lib/superfrete";
 
 type CheckoutItemInput = {
   productId?: string;
@@ -53,6 +54,10 @@ function money(value: number) {
 
 function cents(value: number) {
   return Math.round(value * 100);
+}
+
+function sameMoney(first: number, second: number) {
+  return cents(first) === cents(second);
 }
 
 const redirectUrl = "https://desapego-soares.vercel.app/pagamento/sucesso";
@@ -146,7 +151,22 @@ export async function POST(request: Request) {
   });
 
   const subtotal = money(orderItems.reduce((sum, item) => sum + item.subtotal, 0));
-  const shippingPrice = money(Number(shipping.price));
+  const shippingEstimate = await calculateShippingWithSuperFrete(cleanCep(address.cep)).catch((error) => {
+    console.error("[infinitepay] Falha ao recalcular frete:", error instanceof Error ? error.message : "Erro desconhecido");
+    return null;
+  });
+
+  if (!shippingEstimate) {
+    return NextResponse.json({ error: "Não foi possível validar o frete escolhido." }, { status: 502 });
+  }
+
+  const selectedShipping = shippingEstimate.options.find((option) => option.service === clean(shipping.service));
+
+  if (!selectedShipping || !sameMoney(selectedShipping.price, Number(shipping.price))) {
+    return badRequest("Frete escolhido inválido ou desatualizado. Consulte o frete novamente.");
+  }
+
+  const shippingPrice = money(selectedShipping.price);
   const total = money(subtotal + shippingPrice);
   const orderNsu = crypto.randomUUID();
 
@@ -203,7 +223,7 @@ export async function POST(request: Request) {
       {
         quantity: 1,
         price: cents(shippingPrice),
-        description: `Frete ${clean(shipping.service)}`
+        description: `Frete ${selectedShipping.service}`
       }
     ],
     customer: {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { markOrderPaidByOrderNsu } from "@/lib/supabase/orders";
+import { getOrderByOrderNsu, markOrderPaidByOrderNsu } from "@/lib/supabase/orders";
 
 type InfinitePayWebhookPayload = {
   invoice_slug?: string;
@@ -17,7 +17,26 @@ function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function cents(value: number) {
+  return Math.round(value * 100);
+}
+
+function getPaidAmountInCents(value: unknown) {
+  if (!Number.isFinite(Number(value))) return null;
+
+  const amount = Number(value);
+  return Number.isInteger(amount) && amount >= 1000 ? amount : cents(amount);
+}
+
 export async function POST(request: Request) {
+  const webhookSecret = process.env.INFINITEPAY_WEBHOOK_SECRET?.trim();
+  const requestSecret = request.headers.get("x-infinitepay-webhook-secret")?.trim();
+
+  if (!webhookSecret || requestSecret !== webhookSecret) {
+    console.error("[infinitepay:webhook] Webhook não autorizado.");
+    return NextResponse.json({ ok: false, error: "Não autorizado." }, { status: 401 });
+  }
+
   let payload: InfinitePayWebhookPayload;
 
   try {
@@ -47,6 +66,25 @@ export async function POST(request: Request) {
   }
 
   try {
+    const existingOrder = await getOrderByOrderNsu(orderNsu);
+
+    if (!existingOrder) {
+      console.error("[infinitepay:webhook] Pedido não encontrado:", { order_nsu: orderNsu });
+      return NextResponse.json({ ok: false, error: "Pedido não encontrado." }, { status: 404 });
+    }
+
+    const paidAmountInCents = getPaidAmountInCents(payload.paid_amount ?? payload.amount);
+    const expectedAmountInCents = cents(Number(existingOrder.total));
+
+    if (!paidAmountInCents || paidAmountInCents < expectedAmountInCents) {
+      console.error("[infinitepay:webhook] Valor pago inválido:", {
+        order_nsu: orderNsu,
+        expected_amount: expectedAmountInCents,
+        paid_amount: paidAmountInCents
+      });
+      return NextResponse.json({ ok: false, error: "Valor pago inválido." }, { status: 400 });
+    }
+
     const order = await markOrderPaidByOrderNsu({
       orderNsu,
       transactionNsu: clean(payload.transaction_nsu),
@@ -56,8 +94,8 @@ export async function POST(request: Request) {
     });
 
     if (!order) {
-      console.error("[infinitepay:webhook] Pedido não encontrado:", { order_nsu: orderNsu });
-      return NextResponse.json({ ok: false, error: "Pedido não encontrado." }, { status: 404 });
+      console.error("[infinitepay:webhook] Pedido não atualizado:", { order_nsu: orderNsu });
+      return NextResponse.json({ ok: false, error: "Pedido não atualizado." }, { status: 500 });
     }
 
     console.info("[infinitepay:webhook] Pedido atualizado:", { id: order.id, order_nsu: order.order_nsu, status: order.status });

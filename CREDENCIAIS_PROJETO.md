@@ -20,6 +20,7 @@ ADMIN_PASSWORD=
 SUPERFRETE_TOKEN=
 SUPERFRETE_ORIGIN_CEP=
 INFINITEPAY_HANDLE=
+INFINITEPAY_WEBHOOK_SECRET=
 ```
 
 ### Produção
@@ -52,6 +53,7 @@ Estas variáveis devem existir somente no servidor:
 - `SUPERFRETE_TOKEN`
 - `SUPERFRETE_ORIGIN_CEP`
 - `INFINITEPAY_HANDLE`
+- `INFINITEPAY_WEBHOOK_SECRET`
 
 ## Como Trocar Credenciais
 
@@ -83,8 +85,9 @@ Estas variáveis devem existir somente no servidor:
 
 1. Confirme o handle correto no painel InfinitePay.
 2. Atualize `INFINITEPAY_HANDLE` no provedor de deploy.
-3. Faça novo deploy.
-4. Teste geração de link em checkout.
+3. Gere um segredo forte para `INFINITEPAY_WEBHOOK_SECRET` e configure o mesmo valor no provedor de deploy e no webhook da InfinitePay usando o header `x-infinitepay-webhook-secret`.
+4. Faça novo deploy.
+5. Teste geração de link em checkout e confirmação via webhook.
 
 ## Em Caso de Vazamento
 

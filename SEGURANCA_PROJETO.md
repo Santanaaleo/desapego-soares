@@ -24,6 +24,7 @@ Auditoria realizada no código-fonte local do projeto. Este documento não cont�
 | `SUPERFRETE_TOKEN` | `app/api/frete/route.ts` | Sim para frete em produção | Alta | Permite uso indevido da API SuperFrete e consumo de cota/serviços. |
 | `SUPERFRETE_ORIGIN_CEP` | `app/api/frete/route.ts` | Sim para cálculo correto | Baixa/Média | Expõe CEP de origem logística. Pode revelar localização operacional aproximada. |
 | `INFINITEPAY_HANDLE` | `app/api/checkout/infinitepay/route.ts` | Sim | Alta | Identifica a conta/merchant no checkout. Pode permitir abuso/tentativas de cobrança indevida se combinado com endpoints. |
+| `INFINITEPAY_WEBHOOK_SECRET` | `app/api/webhooks/infinitepay/route.ts` | Sim para webhook em produção | Crítica | Permite autenticar callbacks de pagamento. Vazamento pode permitir tentativa de forjar confirmação de pagamento. |
 | `NODE_ENV` | `hooks/useProducts.ts`, rotas admin cookies | Automática | Baixa | Controla comportamento de ambiente; não é segredo. |
 
 ## Verificação de Segredos Hardcoded
@@ -63,6 +64,7 @@ Variáveis que permanecem server-side:
 - `SUPERFRETE_TOKEN`
 - `SUPERFRETE_ORIGIN_CEP`
 - `INFINITEPAY_HANDLE`
+- `INFINITEPAY_WEBHOOK_SECRET`
 
 Conclusão: a Service Role Key não é enviada diretamente para o frontend pelo código atual.
 

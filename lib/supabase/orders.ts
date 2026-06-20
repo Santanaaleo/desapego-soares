@@ -29,6 +29,14 @@ export async function getOrderForAdmin(id: string) {
   return data as OrderWithItems | null;
 }
 
+export async function getOrderByOrderNsu(orderNsu: string) {
+  if (!supabaseAdmin) return null;
+
+  const { data, error } = await supabaseAdmin.from(ordersTable).select("*").eq("order_nsu", orderNsu).maybeSingle();
+  if (error) throw error;
+  return data as Order | null;
+}
+
 export async function updateOrderStatus(id: string, status: OrderStatus) {
   if (!supabaseAdmin) return null;
 

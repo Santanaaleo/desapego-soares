@@ -196,11 +196,9 @@ export async function POST(request: Request) {
     handle,
     order_nsu: order.order_nsu,
     items: orderItems.map((item) => ({
-      name: item.product_name,
       quantity: item.quantity,
-      unit_price: cents(item.unit_price),
       price: cents(item.unit_price),
-      amount: cents(item.subtotal)
+      description: item.product_name
     })),
     customer: {
       name: `${clean(customer.firstName)} ${clean(customer.lastName)}`,

@@ -5,6 +5,12 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 
+const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
+const MAX_IMAGE_WIDTH = 1800;
+const MAX_IMAGE_HEIGHT = 1800;
+const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+const SUPPORTED_IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "heic", "heif"];
+
 type Props = {
   images: string[];
   onChange: (images: string[]) => void;
@@ -27,7 +33,40 @@ function loadImage(file: File) {
   });
 }
 
-function canvasToBlob(canvas: HTMLCanvasElement) {
+function getFileExtension(file: File) {
+  return file.name.split(".").pop()?.toLowerCase() || "";
+}
+
+function getUploadType(file: File) {
+  const extension = getFileExtension(file);
+
+  if (file.type) {
+    return file.type.toLowerCase();
+  }
+
+  if (extension === "jpg" || extension === "jpeg") return "image/jpeg";
+  if (extension === "png") return "image/png";
+  if (extension === "webp") return "image/webp";
+  if (extension === "heic") return "image/heic";
+  if (extension === "heif") return "image/heif";
+
+  return "";
+}
+
+function validateImage(file: File) {
+  const extension = getFileExtension(file);
+  const type = getUploadType(file);
+
+  if (!SUPPORTED_IMAGE_TYPES.includes(type) || !SUPPORTED_IMAGE_EXTENSIONS.includes(extension)) {
+    throw new Error("Formato não suportado. Envie imagens jpg, jpeg, png, webp, heic ou heif.");
+  }
+
+  if (file.size > MAX_IMAGE_SIZE) {
+    throw new Error("Imagem muito grande. Envie imagens com até 8 MB.");
+  }
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement, type = "image/jpeg", quality = 0.82) {
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (blob) {
@@ -36,8 +75,49 @@ function canvasToBlob(canvas: HTMLCanvasElement) {
       }
 
       reject(new Error("Não foi possível processar a imagem."));
-    }, "image/png");
+    }, type, quality);
   });
+}
+
+async function resizeImage(file: File) {
+  const type = getUploadType(file);
+
+  if (type === "image/heic" || type === "image/heif") {
+    return file;
+  }
+
+  try {
+    const image = await loadImage(file);
+    const scale = Math.min(1, MAX_IMAGE_WIDTH / image.naturalWidth, MAX_IMAGE_HEIGHT / image.naturalHeight);
+
+    if (scale === 1 && file.size <= 2 * 1024 * 1024) {
+      return file;
+    }
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      return file;
+    }
+
+    canvas.width = Math.round(image.naturalWidth * scale);
+    canvas.height = Math.round(image.naturalHeight * scale);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    const outputType = type === "image/png" ? "image/png" : "image/jpeg";
+    const blob = await canvasToBlob(canvas, outputType, 0.82);
+
+    if (blob.size >= file.size) {
+      return file;
+    }
+
+    const extension = outputType === "image/png" ? "png" : "jpg";
+    const baseName = file.name.replace(/\.[^.]+$/, "") || "imagem";
+    return new File([blob], `${baseName}.${extension}`, { type: outputType, lastModified: file.lastModified });
+  } catch {
+    return file;
+  }
 }
 
 async function trimTransparentPng(file: File) {
@@ -98,7 +178,7 @@ async function trimTransparentPng(file: File) {
   trimmedCanvas.height = trimmedHeight;
   trimmedContext.drawImage(canvas, left, top, trimmedWidth, trimmedHeight, 0, 0, trimmedWidth, trimmedHeight);
 
-  const blob = await canvasToBlob(trimmedCanvas);
+  const blob = await canvasToBlob(trimmedCanvas, "image/png");
   return new File([blob], file.name, { type: "image/png", lastModified: file.lastModified });
 }
 
@@ -114,25 +194,29 @@ export function ImageUpload({ images, onChange }: Props) {
     setError("");
 
     try {
-      const urls = await Promise.all(
-        Array.from(files).map(async (file) => {
-          const uploadFile = await trimTransparentPng(file);
-          const formData = new FormData();
-          formData.append("file", uploadFile);
+      const urls: string[] = [];
 
-          const response = await fetch("/api/admin/product-images", {
-            method: "POST",
-            body: formData
-          });
-          const data = (await response.json().catch(() => null)) as { url?: string; message?: string } | null;
+      for (const file of Array.from(files)) {
+        validateImage(file);
+        const resizedFile = await resizeImage(file);
+        const uploadFile = await trimTransparentPng(resizedFile);
+        const formData = new FormData();
+        formData.append("file", uploadFile);
 
-          if (!response.ok || !data?.url) {
-            throw new Error(data?.message || "Não foi possível enviar a imagem.");
-          }
+        const response = await fetch("/api/admin/product-images", {
+          method: "POST",
+          body: formData
+        }).catch(() => {
+          throw new Error("Falha de conexão. Verifique a internet e tente novamente.");
+        });
+        const data = (await response.json().catch(() => null)) as { url?: string; message?: string } | null;
 
-          return data.url;
-        })
-      );
+        if (!response.ok || !data?.url) {
+          throw new Error(data?.message || "Erro ao salvar no storage.");
+        }
+
+        urls.push(data.url);
+      }
 
       onChange([...images, ...urls]);
     } catch (uploadError) {
@@ -165,7 +249,7 @@ export function ImageUpload({ images, onChange }: Props) {
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif"
           multiple
           disabled={uploading}
           className="sr-only"

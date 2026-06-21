@@ -66,6 +66,18 @@ function validateImage(file: File) {
   }
 }
 
+function isMobileUploadDevice() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const userAgent = window.navigator.userAgent.toLowerCase();
+  const isMobileUserAgent = /android|iphone|ipad|ipod|mobile/.test(userAgent);
+  const isTouchOnly = window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(hover: hover)").matches;
+
+  return isMobileUserAgent || isTouchOnly;
+}
+
 function canvasToBlob(canvas: HTMLCanvasElement, type = "image/jpeg", quality = 0.82) {
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {
@@ -194,9 +206,15 @@ export function ImageUpload({ images, onChange }: Props) {
     setError("");
 
     try {
+      const selectedFiles = Array.from(files);
+
+      if (isMobileUploadDevice() && selectedFiles.length > 1) {
+        throw new Error("No celular, envie uma imagem por vez para evitar falhas.");
+      }
+
       const urls: string[] = [];
 
-      for (const file of Array.from(files)) {
+      for (const file of selectedFiles) {
         validateImage(file);
         const resizedFile = await resizeImage(file);
         const uploadFile = await trimTransparentPng(resizedFile);
@@ -250,7 +268,7 @@ export function ImageUpload({ images, onChange }: Props) {
           ref={inputRef}
           type="file"
           accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif"
-          multiple
+          multiple={typeof window === "undefined" ? true : !isMobileUploadDevice()}
           disabled={uploading}
           className="sr-only"
           onChange={(event) => handleFiles(event.target.files)}

@@ -13,6 +13,7 @@ const categoryCovers: Record<ProductCategory, string> = {
   Bonés: "/produtos/categorias/bones-categoria.png",
   Tênis: "/produtos/categorias/tenis-categoria.png",
   Óculos: "/produtos/categorias/oculos-transparente.png",
+  Moletons: "/produtos/categorias/moletons-categoria.png.png",
   Perfumes: "/produtos/categorias/perfumes-categoria.png"
 };
 
@@ -22,6 +23,7 @@ const categoryImageFit: Record<ProductCategory, string> = {
   Bonés: "object-contain object-center scale-[1.06] group-hover:scale-[1.09]",
   Tênis: "object-contain object-center scale-[1.02] group-hover:scale-[1.05]",
   Óculos: "object-contain object-center scale-[1.02] group-hover:scale-[1.05]",
+  Moletons: "object-contain object-center scale-[1.05] group-hover:scale-[1.08]",
   Perfumes: "object-contain object-center scale-[0.92] group-hover:scale-[0.96]"
 };
 
@@ -68,7 +70,7 @@ export default function Home() {
               Ver tudo
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-7">
             {categories.map((category) => {
               return (
                 <Link

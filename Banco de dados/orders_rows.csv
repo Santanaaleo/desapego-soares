@@ -1,0 +1,2 @@
+id,order_nsu,transaction_nsu,invoice_slug,receipt_url,capture_method,status,customer_name,customer_email,customer_phone,zip_code,address,address_number,complement,neighborhood,city,state,subtotal,shipping,total,created_at,updated_at
+6cc66d35-87bc-4acd-95e5-8b41b965d45c,8d73b771-ab7f-4f09-8f8b-1f562437e6bb,,,,infinitepay,pending,Leonardo Santana Garcia,leonardosantanagarcia803@gmail.com,11986857264,09581310,Rua Humberto de Campos,439,,São José,São Caetano do Sul,SP,450.00,13.73,463.73,2026-06-20 21:24:24.303519+00,2026-06-20 21:24:24.303519+00

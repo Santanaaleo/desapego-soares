@@ -1,0 +1,3 @@
+id,name,slug,description,price,category,brand,sizes,condition,featured,active,images,created_at,updated_at
+35f5b3d3-2e25-40fb-be22-23dcab2a99d2,"camisa ",camisa,,120.00,Camisas,,"[""P"",""M""]",,false,true,"[""https://acaxmvpcnjhgvetqgkqw.supabase.co/storage/v1/object/public/product-images/products/94c3bc70-95df-4b05-98a2-67026ec2d8a8-polos-transparente-removebg-preview.png""]",2026-06-20 04:48:05.050419+00,2026-06-20 05:02:41.111+00
+c9629999-2bbb-4c30-ac28-843bf3f34563,Perfuma,perfuma,,450.00,Perfumes,,[],,false,true,"[""https://acaxmvpcnjhgvetqgkqw.supabase.co/storage/v1/object/public/product-images/products/5a6a71db-2e26-44be-90f6-d1ed274ffcb2-WhatsApp_Image_2026-06-17_at_18.27.18-removebg-preview.png""]",2026-06-20 21:13:09.762139+00,2026-06-20 21:13:09.762139+00

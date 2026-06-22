@@ -13,7 +13,7 @@ const categoryCovers: Record<ProductCategory, string> = {
   Bonés: "/produtos/categorias/bones-categoria.png",
   Tênis: "/produtos/categorias/tenis-categoria.png",
   Óculos: "/produtos/categorias/oculos-transparente.png",
-  Moletons: "/produtos/categorias/moletons-categoria.png.png",
+  Moletons: "/produtos/categorias/moletons-categoria.png",
   Perfumes: "/produtos/categorias/perfumes-categoria.png"
 };
 

@@ -1,0 +1,16 @@
+Projeto: Desapego Soares
+
+Site:
+https://desapego-soares.vercel.app
+
+GitHub:
+https://github.com/Santanaaleo/desapego-soares
+
+Supabase:
+Projeto Desapego Soares
+
+Vercel:
+desapego-soares
+
+Data do backup:
+20/06/2026

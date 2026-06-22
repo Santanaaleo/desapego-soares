@@ -4,7 +4,6 @@ import { ArrowRight } from "lucide-react";
 import { CategoryProductSections } from "@/components/product/CategoryProductSections";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
-import { categories } from "@/lib/constants";
 import type { ProductCategory } from "@/types/product";
 
 const categoryCovers: Record<ProductCategory, string> = {
@@ -26,6 +25,8 @@ const categoryImageFit: Record<ProductCategory, string> = {
   Moletons: "object-contain object-center scale-[1.05] group-hover:scale-[1.08]",
   Perfumes: "object-contain object-center scale-[0.92] group-hover:scale-[0.96]"
 };
+
+const homeCategoryOrder: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Bonés", "Tênis", "Óculos", "Perfumes"];
 
 export default function Home() {
   return (
@@ -71,7 +72,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-7">
-            {categories.map((category) => {
+            {homeCategoryOrder.map((category) => {
               return (
                 <Link
                   key={category}

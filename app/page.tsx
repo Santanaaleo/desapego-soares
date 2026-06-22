@@ -1,10 +1,38 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CreditCard, MessageCircle, Truck } from "lucide-react";
 import { CategoryProductSections } from "@/components/product/CategoryProductSections";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import type { ProductCategory } from "@/types/product";
+
+function SecurePurchaseIcon({ size = 34, strokeWidth = 1.7 }: { size?: number; strokeWidth?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 30 30"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M15 3.75L23.25 7.05V13.55C23.25 19.45 19.8 24.6 15 26.25C10.2 24.6 6.75 19.45 6.75 13.55V7.05L15 3.75Z"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M11.75 14.95L14.05 17.25L18.75 12.55"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 const categoryCovers: Record<ProductCategory, string> = {
   Camisas: "/produtos/categorias/camisas.jpeg",
@@ -27,6 +55,29 @@ const categoryImageFit: Record<ProductCategory, string> = {
 };
 
 const homeCategoryOrder: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Bonés", "Tênis", "Óculos", "Perfumes"];
+
+const benefits = [
+  {
+    title: "Compra segura",
+    description: "Seus dados protegidos",
+    icon: SecurePurchaseIcon
+  },
+  {
+    title: "Pix ou cartão",
+    description: "Checkout seguro via InfinitePay",
+    icon: CreditCard
+  },
+  {
+    title: "Entrega para todo Brasil",
+    description: "PAC e SEDEX disponíveis",
+    icon: Truck
+  },
+  {
+    title: "Atendimento direto",
+    description: "Suporte pelo WhatsApp",
+    icon: MessageCircle
+  }
+];
 
 export default function Home() {
   return (
@@ -113,6 +164,24 @@ export default function Home() {
             </Button>
           </div>
           <CategoryProductSections />
+        </Container>
+      </section>
+
+      <section className="bg-white py-12 sm:py-14 lg:py-16">
+        <Container>
+          <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-14">
+            {benefits.map(({ title, description, icon: Icon }) => {
+              return (
+                <div key={title} className="text-center">
+                  <div className="mb-5 flex justify-center text-brand">
+                    <Icon size={34} strokeWidth={1.7} aria-hidden="true" />
+                  </div>
+                  <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-neutral-950">{title}</h2>
+                  <p className="mt-2 text-sm font-medium leading-6 text-neutral-500">{description}</p>
+                </div>
+              );
+            })}
+          </div>
         </Container>
       </section>
     </div>

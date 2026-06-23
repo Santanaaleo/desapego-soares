@@ -1,6 +1,6 @@
 import type { ProductCategory } from "@/types/product";
 
-export const categories: ProductCategory[] = ["Camisas", "Polos", "Bonés", "Tênis", "Óculos", "Moletons", "Perfumes"];
+export const categories: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Shorts", "Bonés", "Tênis", "Óculos", "Perfumes"];
 
 export const brand = {
   name: "DESAPEGO SOARES",

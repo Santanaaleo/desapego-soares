@@ -37,6 +37,7 @@ function SecurePurchaseIcon({ size = 34, strokeWidth = 1.7 }: { size?: number; s
 const categoryCovers: Record<ProductCategory, string> = {
   Camisas: "/produtos/categorias/camisas.jpeg",
   Polos: "/produtos/categorias/polos-categoria.png",
+  Shorts: "/produtos/categorias/shorts-categoria.png",
   Bonés: "/produtos/categorias/bones-categoria.png",
   Tênis: "/produtos/categorias/tenis-categoria.png",
   Óculos: "/produtos/categorias/oculos-transparente.png",
@@ -47,6 +48,7 @@ const categoryCovers: Record<ProductCategory, string> = {
 const categoryImageFit: Record<ProductCategory, string> = {
   Camisas: "object-contain object-center scale-[1.14] group-hover:scale-[1.17]",
   Polos: "object-contain object-center scale-[1.05] group-hover:scale-[1.08]",
+  Shorts: "object-contain object-center scale-[0.92] group-hover:scale-[0.96]",
   Bonés: "object-contain object-center scale-[1.06] group-hover:scale-[1.09]",
   Tênis: "object-contain object-center scale-[1.02] group-hover:scale-[1.05]",
   Óculos: "object-contain object-center scale-[1.02] group-hover:scale-[1.05]",
@@ -54,7 +56,7 @@ const categoryImageFit: Record<ProductCategory, string> = {
   Perfumes: "object-contain object-center scale-[0.92] group-hover:scale-[0.96]"
 };
 
-const homeCategoryOrder: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Bonés", "Tênis", "Óculos", "Perfumes"];
+const homeCategoryOrder: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Shorts", "Bonés", "Tênis", "Óculos", "Perfumes"];
 
 const benefits = [
   {
@@ -122,7 +124,7 @@ export default function Home() {
               Ver tudo
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-7">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
             {homeCategoryOrder.map((category) => {
               return (
                 <Link

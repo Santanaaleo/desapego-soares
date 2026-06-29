@@ -31,20 +31,20 @@ export function CartSummary({ items, total }: { items: CartItem[]; total: number
         <span className="font-black uppercase text-neutral-700">Subtotal</span>
         <span className="font-display text-2xl font-black text-brand">{formatPrice(total)}</span>
       </div>
-      <section className="relative mt-4 rounded-md border border-neutral-200 bg-white p-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+      <section className="relative mt-3 rounded-md border border-neutral-200 bg-white px-3 py-2">
+        <div className="flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
           <div>
-            <h3 className="text-xs font-black uppercase text-neutral-950">Formas de pagamento</h3>
-            <p className="mt-1 text-xs font-semibold text-neutral-600">Pix à vista ou em até 12x no cartão</p>
+            <h3 className="text-[10px] font-black uppercase leading-4 text-neutral-900">Formas de pagamento</h3>
+            <p className="text-[11px] font-semibold leading-4 text-neutral-500">Pix à vista ou em até 12x no cartão</p>
           </div>
           <div className="text-left sm:text-right">
-            <p className="text-sm font-black text-brand">
+            <p className="text-xs font-extrabold leading-4 text-brand">
               {bestInstallment.label} de {bestInstallment.formattedInstallmentAmount}
             </p>
             <button
               type="button"
               onClick={() => setShowInstallments((current) => !current)}
-              className="focus-ring mt-1 rounded-sm text-xs font-black uppercase text-neutral-600 underline underline-offset-4 transition hover:text-brand"
+              className="focus-ring rounded-sm text-[11px] font-semibold leading-4 text-brand underline underline-offset-4 transition hover:text-neutral-950"
               aria-expanded={showInstallments}
             >
               {showInstallments ? "Ocultar parcelas" : "Ver parcelas"}

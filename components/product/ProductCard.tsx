@@ -2,9 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/formatters";
+import { calculateBestInstallment } from "@/lib/installments";
 import type { Product } from "@/types/product";
 
 export function ProductCard({ product }: { product: Product }) {
+  const bestInstallment = calculateBestInstallment(product.price);
+
   return (
     <article className="group mx-auto flex h-full w-[94%] flex-col overflow-hidden rounded-md border border-neutral-200 bg-white transition hover:border-brand hover:shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
       <Link href={`/produto/${product.slug}`} className="relative block overflow-hidden bg-neutral-100">
@@ -42,6 +45,9 @@ export function ProductCard({ product }: { product: Product }) {
           <p className="min-h-3 text-xs font-medium text-neutral-600">Tamanhos: {product.sizes.join(", ")}</p>
         ) : null}
         <p className="mt-auto text-lg font-extrabold text-neutral-950">{formatPrice(product.price)}</p>
+        <p className="text-[11px] font-semibold leading-4 text-neutral-500">
+          ou {bestInstallment.label} de {bestInstallment.formattedInstallmentAmount}
+        </p>
         {product.sold_out ? <p className="text-xs font-bold uppercase text-red-600">Produto indisponível para compra</p> : null}
         <Button href={`/produto/${product.slug}`} variant="secondary" className="mt-1 w-full">
           Ver produto

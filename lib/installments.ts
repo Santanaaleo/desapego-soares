@@ -33,3 +33,7 @@ export function calculateInstallments(orderTotal: number) {
     };
   });
 }
+
+export function calculateBestInstallment(orderTotal: number) {
+  return calculateInstallments(orderTotal).find((option) => option.installments === 12)!;
+}

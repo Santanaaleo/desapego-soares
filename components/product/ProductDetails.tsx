@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { addProductToCart, cartStorageKey } from "@/lib/cart";
 import { formatPrice } from "@/lib/formatters";
+import { calculateBestInstallment } from "@/lib/installments";
 import type { CartItem } from "@/types/cart";
 import type { Product } from "@/types/product";
 
@@ -14,6 +15,7 @@ export function ProductDetails({ product }: { product: Product }) {
   const [selectedSize, setSelectedSize] = useState("");
   const [error, setError] = useState("");
   const availableSizes = product.sizes.filter(Boolean);
+  const bestInstallment = calculateBestInstallment(product.price);
 
   function addToCart() {
     if (product.sold_out) {
@@ -51,7 +53,12 @@ export function ProductDetails({ product }: { product: Product }) {
         <p className="mt-2 text-sm font-medium uppercase text-neutral-500">{product.brand}</p>
       </div>
 
-      <p className="font-display text-3xl font-extrabold text-neutral-950">{formatPrice(product.price)}</p>
+      <div>
+        <p className="font-display text-3xl font-extrabold text-neutral-950">{formatPrice(product.price)}</p>
+        <p className="mt-1 text-sm font-semibold text-neutral-600">
+          ou {bestInstallment.label} de {bestInstallment.formattedInstallmentAmount} no cartão
+        </p>
+      </div>
       {product.sold_out ? (
         <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">
           Produto esgotado no momento. Ele permanece visível apenas como parte do catálogo.

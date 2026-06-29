@@ -8,10 +8,10 @@ import { calculateInstallments } from "@/lib/installments";
 import type { CartItem } from "@/types/cart";
 
 export function CartSummary({ items, total }: { items: CartItem[]; total: number }) {
-  const [showAllInstallments, setShowAllInstallments] = useState(false);
+  const [showInstallments, setShowInstallments] = useState(false);
   const disabled = items.length === 0;
   const installments = calculateInstallments(total);
-  const visibleInstallments = showAllInstallments ? installments : installments.slice(0, 5);
+  const bestInstallment = installments[installments.length - 1];
 
   return (
     <aside className="rounded-md border border-neutral-200 bg-neutral-50 p-5">
@@ -31,38 +31,57 @@ export function CartSummary({ items, total }: { items: CartItem[]; total: number
         <span className="font-black uppercase text-neutral-700">Subtotal</span>
         <span className="font-display text-2xl font-black text-brand">{formatPrice(total)}</span>
       </div>
-      <section className="mt-5 border-t border-neutral-200 pt-5">
-        <h3 className="font-display text-lg font-black uppercase text-neutral-950">Formas de pagamento</h3>
-
-        <div className="mt-4 rounded-md border border-neutral-200 bg-white p-4">
-          <p className="text-sm font-black uppercase text-neutral-950">Pix</p>
-          <p className="mt-1 text-sm font-semibold text-neutral-600">À vista</p>
-        </div>
-
-        <div className="mt-3 rounded-md border border-neutral-200 bg-white p-4">
-          <p className="text-sm font-black uppercase text-neutral-950">Cartão de crédito</p>
-          <div className="mt-3 grid gap-2 text-sm text-neutral-700 sm:grid-cols-2 lg:grid-cols-1">
-            {visibleInstallments.map((option) => (
-              <div key={option.installments} className="flex items-center justify-between gap-3 rounded-md bg-neutral-50 px-3 py-2">
-                <span className="font-semibold">{option.installments === 1 ? "À vista" : option.label}</span>
-                <strong className="text-right text-neutral-950">
-                  {option.installments === 1
-                    ? option.formattedInstallmentAmount
-                    : `${option.label} de ${option.formattedInstallmentAmount}`}
-                </strong>
-              </div>
-            ))}
+      <section className="relative mt-4 rounded-md border border-neutral-200 bg-white p-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 className="text-xs font-black uppercase text-neutral-950">Formas de pagamento</h3>
+            <p className="mt-1 text-xs font-semibold text-neutral-600">Pix à vista ou em até 12x no cartão</p>
           </div>
-          {!showAllInstallments ? (
+          <div className="text-left sm:text-right">
+            <p className="text-sm font-black text-brand">
+              {bestInstallment.label} de {bestInstallment.formattedInstallmentAmount}
+            </p>
             <button
               type="button"
-              onClick={() => setShowAllInstallments(true)}
-              className="focus-ring mt-3 w-full rounded-md border border-neutral-300 px-4 py-2 text-xs font-black uppercase text-neutral-950 transition hover:border-brand hover:text-brand"
+              onClick={() => setShowInstallments((current) => !current)}
+              className="focus-ring mt-1 rounded-sm text-xs font-black uppercase text-neutral-600 underline underline-offset-4 transition hover:text-brand"
+              aria-expanded={showInstallments}
             >
-              Ver todas as parcelas
+              {showInstallments ? "Ocultar parcelas" : "Ver parcelas"}
             </button>
-          ) : null}
+          </div>
         </div>
+
+        {showInstallments ? (
+          <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-20 rounded-md border border-neutral-200 bg-white p-3 shadow-lg">
+            <div className="mb-2 flex items-center justify-between gap-3 border-b border-neutral-100 pb-2">
+              <p className="text-xs font-black uppercase text-neutral-950">Parcelamento</p>
+              <button
+                type="button"
+                onClick={() => setShowInstallments(false)}
+                className="focus-ring rounded-sm text-xs font-black uppercase text-neutral-500 hover:text-brand"
+              >
+                Fechar
+              </button>
+            </div>
+            <div className="grid max-h-72 gap-1 overflow-auto text-xs text-neutral-700 sm:grid-cols-2 lg:grid-cols-1">
+              <div className="flex items-center justify-between gap-3 rounded-md bg-neutral-50 px-3 py-2">
+                <span className="font-semibold">Pix</span>
+                <strong className="text-neutral-950">À vista</strong>
+              </div>
+              {installments.map((option) => (
+                <div key={option.installments} className="flex items-center justify-between gap-3 rounded-md bg-neutral-50 px-3 py-2">
+                  <span className="font-semibold">{option.installments === 1 ? "Crédito à vista" : option.label}</span>
+                  <strong className="text-right text-neutral-950">
+                    {option.installments === 1
+                      ? option.formattedInstallmentAmount
+                      : `${option.label} de ${option.formattedInstallmentAmount}`}
+                  </strong>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </section>
       {disabled ? (
         <Button className="mt-6 w-full gap-2" disabled>

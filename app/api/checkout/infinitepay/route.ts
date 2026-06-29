@@ -36,6 +36,7 @@ type ProductRow = {
   name: string;
   price: number | string;
   active: boolean;
+  sold_out: boolean;
 };
 
 const infinitePayUrl = "https://api.checkout.infinitepay.io/links";
@@ -120,7 +121,7 @@ export async function POST(request: Request) {
   const productIds = Array.from(new Set(normalizedItems.map((item) => item.productId)));
   const { data: products, error: productsError } = await supabaseAdmin
     .from("products")
-    .select("id,name,price,active")
+    .select("id,name,price,active,sold_out")
     .in("id", productIds)
     .eq("active", true);
 
@@ -129,10 +130,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Não foi possível validar os produtos." }, { status: 500 });
   }
 
-  const productMap = new Map((products as ProductRow[] | null)?.map((product) => [product.id, product]) ?? []);
+  const productRows = (products as ProductRow[] | null) ?? [];
+  const productMap = new Map(productRows.map((product) => [product.id, product]));
 
   if (productMap.size !== productIds.length) {
     return badRequest("Um ou mais produtos não estão disponíveis.");
+  }
+
+  if (productRows.some((product) => product.sold_out)) {
+    return badRequest("Um ou mais produtos estão esgotados.");
   }
 
   const orderItems = normalizedItems.map((item) => {

@@ -23,6 +23,7 @@ export function ProductForm({ product, onSubmit }: Props) {
   const [condition, setCondition] = useState(product?.condition || "");
   const [featured, setFeatured] = useState(product?.featured || false);
   const [active, setActive] = useState(product?.active ?? true);
+  const [soldOut, setSoldOut] = useState(product?.sold_out ?? false);
   const [images, setImages] = useState(product?.images || []);
   const [error, setError] = useState("");
 
@@ -67,6 +68,7 @@ export function ProductForm({ product, onSubmit }: Props) {
       condition,
       featured,
       active,
+      sold_out: soldOut,
       images: images.length ? images : ["/produtos/polos/polo-3.jpeg"]
     });
   }
@@ -121,6 +123,10 @@ export function ProductForm({ product, onSubmit }: Props) {
         <label className="flex items-center gap-2 text-sm font-bold">
           <input type="checkbox" checked={active} onChange={(event) => setActive(event.target.checked)} />
           Ativo
+        </label>
+        <label className="flex items-center gap-2 text-sm font-bold">
+          <input type="checkbox" checked={soldOut} onChange={(event) => setSoldOut(event.target.checked)} />
+          Produto esgotado
         </label>
       </div>
       <ImageUpload images={images} onChange={setImages} />

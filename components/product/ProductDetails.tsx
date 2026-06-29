@@ -16,6 +16,12 @@ export function ProductDetails({ product }: { product: Product }) {
   const availableSizes = product.sizes.filter(Boolean);
 
   function addToCart() {
+    if (product.sold_out) {
+      setError("Este produto está esgotado e não pode ser adicionado a sacola.");
+      setAdded(false);
+      return;
+    }
+
     if (availableSizes.length && !selectedSize) {
       setError("Selecione um tamanho antes de adicionar a sacola.");
       setAdded(false);
@@ -34,6 +40,11 @@ export function ProductDetails({ product }: { product: Product }) {
     <div className="grid content-start gap-5">
       <div>
         <p className="text-xs font-semibold uppercase text-brand">{product.category}</p>
+        {product.sold_out ? (
+          <span className="mt-3 inline-flex rounded-full bg-neutral-950 px-3 py-1 text-xs font-black uppercase text-white">
+            Esgotado
+          </span>
+        ) : null}
         <h1 className="mt-2 font-display text-3xl font-semibold uppercase leading-tight text-neutral-950 sm:text-4xl">
           {product.name}
         </h1>
@@ -41,6 +52,11 @@ export function ProductDetails({ product }: { product: Product }) {
       </div>
 
       <p className="font-display text-3xl font-extrabold text-neutral-950">{formatPrice(product.price)}</p>
+      {product.sold_out ? (
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">
+          Produto esgotado no momento. Ele permanece visível apenas como parte do catálogo.
+        </div>
+      ) : null}
       <p className="text-sm leading-6 text-neutral-700">{product.description}</p>
 
       <div className="grid gap-2 border-y border-neutral-200 py-4 text-sm">
@@ -80,9 +96,9 @@ export function ProductDetails({ product }: { product: Product }) {
         </div>
       ) : null}
 
-      <Button onClick={addToCart} className="gap-2">
+      <Button onClick={addToCart} className="gap-2 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600" disabled={product.sold_out}>
         <ShoppingBag size={18} />
-        {added ? "Adicionar mais uma" : "Adicionar a sacola"}
+        {product.sold_out ? "Esgotado" : added ? "Adicionar mais uma" : "Adicionar a sacola"}
       </Button>
       {added ? (
         <div className="rounded-md border border-brand/30 bg-brand-mist p-3 text-sm font-bold text-brand">

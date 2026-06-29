@@ -8,6 +8,10 @@ export function getCartItemKey(productId: string, size: string) {
 }
 
 export function addProductToCart(items: CartItem[], product: Product, size: string) {
+  if (product.sold_out) {
+    return items;
+  }
+
   const current = items.find((item) => item.product.id === product.id && item.size === size);
 
   if (current) {

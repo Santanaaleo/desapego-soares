@@ -16,6 +16,7 @@ export const mockProducts: Product[] = [
     condition: "Original, seminova",
     featured: true,
     active: true,
+    sold_out: false,
     images: [
       "/produtos/polos/polo-3.jpeg",
       "/produtos/polos/polo-1.jpeg",
@@ -38,6 +39,7 @@ export const mockProducts: Product[] = [
     condition: "Original, com etiqueta",
     featured: true,
     active: true,
+    sold_out: false,
     images: [
       "/produtos/polos/polo-12.jpeg",
       "/produtos/polos/polo-9.jpeg",
@@ -60,6 +62,7 @@ export const mockProducts: Product[] = [
     condition: "Original, excelente estado",
     featured: false,
     active: true,
+    sold_out: false,
     images: [
       "/produtos/polos/polo-5.jpeg",
       "/produtos/polos/polo-6.jpeg",

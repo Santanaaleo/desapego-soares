@@ -40,6 +40,7 @@ export function ProductTable({ products, onDelete, onToggleActive, onToggleFeatu
               <span className={product.active ? "text-brand" : "text-red-600"}>
                 {product.active ? "Ativo" : "Inativo"}
               </span>
+              {product.sold_out ? <span className="text-red-600">Esgotado</span> : null}
               {product.featured ? <span className="text-brand">Destaque</span> : null}
             </div>
           </div>

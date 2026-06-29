@@ -12,6 +12,7 @@ export type Product = {
   condition: string;
   featured: boolean;
   active: boolean;
+  sold_out: boolean;
   images: string[];
   created_at: string;
   updated_at: string;

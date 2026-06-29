@@ -14,7 +14,7 @@ export function CartSummary({ items, total }: { items: CartItem[]; total: number
   const bestInstallment = installments[installments.length - 1];
 
   return (
-    <aside className="rounded-md border border-neutral-200 bg-neutral-50 p-5">
+    <aside className="self-start rounded-md border border-neutral-200 bg-neutral-50 p-5">
       <h2 className="font-display text-xl font-black uppercase text-neutral-950">Resumo da sacola</h2>
       <div className="mt-4 grid gap-2 text-sm text-neutral-700">
         {items.map((item) => (

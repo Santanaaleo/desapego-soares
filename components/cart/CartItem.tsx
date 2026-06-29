@@ -15,7 +15,7 @@ export function CartItem({ item, onRemove, onQuantity }: Props) {
   const subtotal = item.product.price * item.quantity;
 
   return (
-    <div className="grid grid-cols-[92px_1fr] gap-4 rounded-md border border-neutral-200 bg-white p-3 sm:grid-cols-[120px_1fr_auto]">
+    <div className="grid self-start grid-cols-[92px_1fr] gap-4 rounded-md border border-neutral-200 bg-white p-3 sm:grid-cols-[120px_1fr_auto]">
       <div className="relative aspect-square overflow-hidden rounded-md bg-neutral-100">
         <Image src={item.product.images[0]} alt={item.product.name} fill sizes="120px" className="object-contain object-center p-2" />
       </div>

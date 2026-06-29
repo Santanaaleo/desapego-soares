@@ -21,8 +21,8 @@ export default function CarrinhoPage() {
         </div>
 
         {items.length ? (
-          <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-            <div className="grid gap-4">
+          <div className="grid items-start gap-6 lg:grid-cols-[1fr_360px]">
+            <div className="grid content-start gap-4">
               {items.map((item) => (
                 <CartItem
                   key={`${item.product.id}-${item.size}`}

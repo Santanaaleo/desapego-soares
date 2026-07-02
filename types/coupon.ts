@@ -11,4 +11,5 @@ export type AppliedCoupon = {
   code: string;
   discountPercent: number;
   discountAmount: number;
+  subtotal?: number;
 };

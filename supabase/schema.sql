@@ -19,6 +19,90 @@ create index if not exists products_category_idx on products (category);
 create index if not exists products_featured_idx on products (featured);
 create index if not exists products_active_idx on products (active);
 
+alter table products
+  add column if not exists stock_quantity integer not null default 1;
+
+alter table products
+  add constraint products_stock_quantity_check check (stock_quantity >= 0);
+
+create index if not exists products_stock_quantity_idx on products (stock_quantity);
+
+create or replace function confirm_order_paid_with_stock(
+  input_order_nsu text,
+  input_transaction_nsu text default null,
+  input_invoice_slug text default null,
+  input_receipt_url text default null,
+  input_capture_method text default null
+)
+returns table(id uuid, order_nsu text, status text, coupon_code text)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  order_row orders%rowtype;
+  order_item record;
+  current_stock integer;
+  next_stock integer;
+begin
+  select *
+    into order_row
+    from orders
+    where orders.order_nsu = input_order_nsu
+    for update;
+
+  if not found then
+    return;
+  end if;
+
+  if order_row.status = 'paid' then
+    return;
+  end if;
+
+  for order_item in
+    select product_id, quantity
+      from order_items
+      where order_id = order_row.id
+        and product_id is not null
+  loop
+    select stock_quantity
+      into current_stock
+      from products
+      where products.id = order_item.product_id
+      for update;
+
+    if current_stock is null then
+      raise exception 'Produto não encontrado.';
+    end if;
+
+    if current_stock < order_item.quantity then
+      raise exception 'Estoque insuficiente.';
+    end if;
+
+    next_stock := current_stock - order_item.quantity;
+
+    update products
+      set stock_quantity = next_stock,
+          sold_out = next_stock = 0,
+          updated_at = now()
+      where products.id = order_item.product_id;
+  end loop;
+
+  update orders
+    set status = 'paid',
+        transaction_nsu = input_transaction_nsu,
+        invoice_slug = input_invoice_slug,
+        receipt_url = input_receipt_url,
+        capture_method = input_capture_method,
+        updated_at = now()
+    where orders.id = order_row.id
+    returning orders.id, orders.order_nsu, orders.status, orders.coupon_code
+    into id, order_nsu, status, coupon_code;
+
+  return next;
+end;
+$$;
+
 create table if not exists coupons (
   id uuid primary key default gen_random_uuid(),
   code text unique not null,

@@ -37,6 +37,19 @@ export async function getOrderByOrderNsu(orderNsu: string) {
   return data as Order | null;
 }
 
+export async function getOrderWithItemsByOrderNsu(orderNsu: string) {
+  if (!supabaseAdmin) return null;
+
+  const { data, error } = await supabaseAdmin
+    .from(ordersTable)
+    .select("*, order_items(*)")
+    .eq("order_nsu", orderNsu)
+    .order("created_at", { referencedTable: "order_items", ascending: true })
+    .maybeSingle();
+  if (error) throw error;
+  return data as OrderWithItems | null;
+}
+
 export async function updateOrderStatus(id: string, status: OrderStatus) {
   if (!supabaseAdmin) return null;
 
@@ -72,19 +85,13 @@ export async function markOrderPaidByOrderNsu(input: {
 }) {
   if (!supabaseAdmin) return null;
 
-  const { data, error } = await supabaseAdmin
-    .from(ordersTable)
-    .update({
-      status: "paid",
-      transaction_nsu: input.transactionNsu || null,
-      invoice_slug: input.invoiceSlug || null,
-      receipt_url: input.receiptUrl || null,
-      capture_method: input.captureMethod || null,
-      updated_at: new Date().toISOString()
-    })
-    .eq("order_nsu", input.orderNsu)
-    .select("id,order_nsu,status,coupon_code")
-    .maybeSingle();
+  const { data, error } = await supabaseAdmin.rpc("confirm_order_paid_with_stock", {
+    input_order_nsu: input.orderNsu,
+    input_transaction_nsu: input.transactionNsu || null,
+    input_invoice_slug: input.invoiceSlug || null,
+    input_receipt_url: input.receiptUrl || null,
+    input_capture_method: input.captureMethod || null
+  });
   if (error) throw error;
-  return data as Pick<Order, "id" | "order_nsu" | "status" | "coupon_code"> | null;
+  return ((data as Pick<Order, "id" | "order_nsu" | "status" | "coupon_code">[] | null) ?? [])[0] ?? null;
 }

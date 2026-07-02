@@ -13,6 +13,7 @@ export type Product = {
   featured: boolean;
   active: boolean;
   sold_out: boolean;
+  stock_quantity: number;
   images: string[];
   created_at: string;
   updated_at: string;

@@ -13,7 +13,13 @@ function readCart() {
   try {
     const value = window.localStorage.getItem(cartStorageKey);
     const parsed = value ? (JSON.parse(value) as CartItem[]) : [];
-    return parsed.filter((item) => item.product && typeof item.size === "string");
+    return parsed
+      .filter((item) => item.product && typeof item.size === "string")
+      .map((item) => {
+        const stockQuantity = Number.isInteger(item.product.stock_quantity) ? item.product.stock_quantity : item.quantity;
+        return { ...item, product: { ...item.product, stock_quantity: stockQuantity }, quantity: Math.min(item.quantity, stockQuantity) };
+      })
+      .filter((item) => item.quantity > 0 && item.product.stock_quantity > 0);
   } catch {
     return [];
   }

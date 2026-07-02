@@ -16,9 +16,10 @@ export function ProductDetails({ product }: { product: Product }) {
   const [error, setError] = useState("");
   const availableSizes = product.sizes.filter(Boolean);
   const bestInstallment = calculateBestInstallment(product.price);
+  const unavailable = product.sold_out || product.stock_quantity <= 0;
 
   function addToCart() {
-    if (product.sold_out) {
+    if (unavailable) {
       setError("Este produto está esgotado e não pode ser adicionado a sacola.");
       setAdded(false);
       return;
@@ -32,7 +33,17 @@ export function ProductDetails({ product }: { product: Product }) {
 
     const stored = window.localStorage.getItem(cartStorageKey);
     const items = stored ? (JSON.parse(stored) as CartItem[]) : [];
-    window.localStorage.setItem(cartStorageKey, JSON.stringify(addProductToCart(items, product, selectedSize)));
+    const currentQuantity = items.find((item) => item.product.id === product.id && item.size === selectedSize)?.quantity ?? 0;
+    const nextItems = addProductToCart(items, product, selectedSize);
+    const nextQuantity = nextItems.find((item) => item.product.id === product.id && item.size === selectedSize)?.quantity ?? 0;
+
+    if (nextQuantity <= currentQuantity) {
+      setError("Quantidade máxima disponível em estoque.");
+      setAdded(false);
+      return;
+    }
+
+    window.localStorage.setItem(cartStorageKey, JSON.stringify(nextItems));
     window.dispatchEvent(new Event("cart-updated"));
     setError("");
     setAdded(true);
@@ -42,7 +53,7 @@ export function ProductDetails({ product }: { product: Product }) {
     <div className="grid content-start gap-5">
       <div>
         <p className="text-xs font-semibold uppercase text-brand">{product.category}</p>
-        {product.sold_out ? (
+        {unavailable ? (
           <span className="mt-3 inline-flex rounded-full bg-neutral-950 px-3 py-1 text-xs font-black uppercase text-white">
             Esgotado
           </span>
@@ -59,7 +70,7 @@ export function ProductDetails({ product }: { product: Product }) {
           ou {bestInstallment.label} de {bestInstallment.formattedInstallmentAmount} no cartão
         </p>
       </div>
-      {product.sold_out ? (
+      {unavailable ? (
         <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">
           Produto esgotado no momento. Ele permanece visível apenas como parte do catálogo.
         </div>
@@ -103,9 +114,9 @@ export function ProductDetails({ product }: { product: Product }) {
         </div>
       ) : null}
 
-      <Button onClick={addToCart} className="gap-2 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600" disabled={product.sold_out}>
+      <Button onClick={addToCart} className="gap-2 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600" disabled={unavailable}>
         <ShoppingBag size={18} />
-        {product.sold_out ? "Esgotado" : added ? "Adicionar mais uma" : "Adicionar a sacola"}
+        {unavailable ? "Esgotado" : added ? "Adicionar mais uma" : "Adicionar a sacola"}
       </Button>
       {added ? (
         <div className="rounded-md border border-brand/30 bg-brand-mist p-3 text-sm font-bold text-brand">

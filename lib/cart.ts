@@ -8,7 +8,7 @@ export function getCartItemKey(productId: string, size: string) {
 }
 
 export function addProductToCart(items: CartItem[], product: Product, size: string) {
-  if (product.sold_out) {
+  if (product.sold_out || product.stock_quantity <= 0) {
     return items;
   }
 
@@ -16,7 +16,9 @@ export function addProductToCart(items: CartItem[], product: Product, size: stri
 
   if (current) {
     return items.map((item) =>
-      item.product.id === product.id && item.size === size ? { ...item, quantity: item.quantity + 1 } : item
+      item.product.id === product.id && item.size === size
+        ? { ...item, quantity: Math.min(item.quantity + 1, product.stock_quantity) }
+        : item
     );
   }
 
@@ -28,7 +30,9 @@ export function updateCartQuantity(items: CartItem[], productId: string, size: s
     return items.filter((item) => getCartItemKey(item.product.id, item.size) !== getCartItemKey(productId, size));
   }
 
-  return items.map((item) =>
-    item.product.id === productId && item.size === size ? { ...item, quantity } : item
-  );
+  return items.map((item) => {
+    if (item.product.id !== productId || item.size !== size) return item;
+
+    return { ...item, quantity: Math.min(quantity, item.product.stock_quantity) };
+  });
 }

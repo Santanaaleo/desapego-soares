@@ -7,11 +7,12 @@ import type { Product } from "@/types/product";
 
 export function ProductCard({ product }: { product: Product }) {
   const bestInstallment = calculateBestInstallment(product.price);
+  const unavailable = product.sold_out || product.stock_quantity <= 0;
 
   return (
     <article className="group mx-auto flex h-full w-[94%] flex-col overflow-hidden rounded-md border border-neutral-200 bg-white transition hover:border-brand hover:shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
       <Link href={`/produto/${product.slug}`} className="relative block overflow-hidden bg-neutral-100">
-        {product.sold_out ? (
+        {unavailable ? (
           <span className="absolute left-3 top-3 z-10 rounded-full bg-neutral-950 px-3 py-1 text-xs font-black uppercase text-white">
             Esgotado
           </span>
@@ -24,7 +25,7 @@ export function ProductCard({ product }: { product: Product }) {
             height={290}
             sizes="(min-width: 768px) 33vw, 50vw"
             className={`h-[220px] w-[220px] object-contain object-center transition duration-300 sm:h-[260px] sm:w-[260px] md:h-[290px] md:w-[290px] ${
-              product.sold_out ? "opacity-60 grayscale" : ""
+              unavailable ? "opacity-60 grayscale" : ""
             }`}
             unoptimized={product.images[0]?.startsWith("data:")}
           />
@@ -33,7 +34,7 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="flex flex-1 flex-col gap-1 bg-white px-3 pb-3 pt-2">
         <div className="flex min-h-3 items-center justify-between gap-3 text-[11px] font-semibold uppercase">
           <span className="text-brand">{product.category}</span>
-          {product.sold_out ? <span className="text-red-600">Esgotado</span> : product.featured ? <span className="text-neutral-500">Destaque</span> : null}
+          {unavailable ? <span className="text-red-600">Esgotado</span> : product.featured ? <span className="text-neutral-500">Destaque</span> : null}
         </div>
         <Link href={`/produto/${product.slug}`}>
           <h3 className="line-clamp-2 min-h-8 text-sm font-medium leading-5 text-neutral-950 transition group-hover:text-brand">
@@ -48,7 +49,7 @@ export function ProductCard({ product }: { product: Product }) {
         <p className="text-[11px] font-semibold leading-4 text-neutral-500">
           ou {bestInstallment.label} de {bestInstallment.formattedInstallmentAmount}
         </p>
-        {product.sold_out ? <p className="text-xs font-bold uppercase text-red-600">Produto indisponível para compra</p> : null}
+        {unavailable ? <p className="text-xs font-bold uppercase text-red-600">Produto indisponível para compra</p> : null}
         <Button href={`/produto/${product.slug}`} variant="secondary" className="mt-1 w-full">
           Ver produto
         </Button>

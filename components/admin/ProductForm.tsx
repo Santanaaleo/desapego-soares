@@ -24,6 +24,7 @@ export function ProductForm({ product, onSubmit }: Props) {
   const [featured, setFeatured] = useState(product?.featured || false);
   const [active, setActive] = useState(product?.active ?? true);
   const [soldOut, setSoldOut] = useState(product?.sold_out ?? false);
+  const [stockQuantity, setStockQuantity] = useState(product?.stock_quantity.toString() || "1");
   const [images, setImages] = useState(product?.images || []);
   const [error, setError] = useState("");
 
@@ -44,6 +45,7 @@ export function ProductForm({ product, onSubmit }: Props) {
       .map((size) => size.trim())
       .filter(Boolean);
     const numericPrice = parsePrice(price);
+    const numericStock = Number(stockQuantity);
 
     if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
       setError("Informe um preço maior que zero.");
@@ -52,6 +54,11 @@ export function ProductForm({ product, onSubmit }: Props) {
 
     if (!slug) {
       setError("Informe um nome válido para gerar o slug do produto.");
+      return;
+    }
+
+    if (!Number.isInteger(numericStock) || numericStock < 0) {
+      setError("Informe uma quantidade em estoque igual ou maior que zero.");
       return;
     }
 
@@ -68,7 +75,8 @@ export function ProductForm({ product, onSubmit }: Props) {
       condition,
       featured,
       active,
-      sold_out: soldOut,
+      sold_out: numericStock === 0 ? true : soldOut,
+      stock_quantity: numericStock,
       images: images.length ? images : ["/produtos/polos/polo-3.jpeg"]
     });
   }
@@ -95,6 +103,15 @@ export function ProductForm({ product, onSubmit }: Props) {
         </select>
         <Input value={brand} onChange={(event) => setBrand(event.target.value)} placeholder="Marca" />
         <Input value={condition} onChange={(event) => setCondition(event.target.value)} placeholder="Condição" />
+        <Input
+          required
+          min="0"
+          step="1"
+          type="number"
+          value={stockQuantity}
+          onChange={(event) => setStockQuantity(event.target.value)}
+          placeholder="Quantidade em estoque"
+        />
       </div>
 
       <div className="grid gap-3">
@@ -125,7 +142,7 @@ export function ProductForm({ product, onSubmit }: Props) {
           Ativo
         </label>
         <label className="flex items-center gap-2 text-sm font-bold">
-          <input type="checkbox" checked={soldOut} onChange={(event) => setSoldOut(event.target.checked)} />
+          <input type="checkbox" checked={soldOut || Number(stockQuantity) === 0} onChange={(event) => setSoldOut(event.target.checked)} />
           Produto esgotado
         </label>
       </div>

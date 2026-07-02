@@ -39,6 +39,7 @@ type ProductRow = {
   price: number | string;
   active: boolean;
   sold_out: boolean;
+  stock_quantity: number;
 };
 
 const infinitePayUrl = "https://api.checkout.infinitepay.io/links";
@@ -123,7 +124,7 @@ export async function POST(request: Request) {
   const productIds = Array.from(new Set(normalizedItems.map((item) => item.productId)));
   const { data: products, error: productsError } = await supabaseAdmin
     .from("products")
-    .select("id,name,price,active,sold_out")
+    .select("id,name,price,active,sold_out,stock_quantity")
     .in("id", productIds)
     .eq("active", true);
 
@@ -141,6 +142,10 @@ export async function POST(request: Request) {
 
   if (productRows.some((product) => product.sold_out)) {
     return badRequest("Um ou mais produtos estão esgotados.");
+  }
+
+  if (normalizedItems.some((item) => Number(productMap.get(item.productId)?.stock_quantity ?? 0) < item.quantity)) {
+    return badRequest("Quantidade máxima disponível em estoque.");
   }
 
   const orderItems = normalizedItems.map((item) => {

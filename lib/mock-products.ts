@@ -17,6 +17,7 @@ export const mockProducts: Product[] = [
     featured: true,
     active: true,
     sold_out: false,
+    stock_quantity: 1,
     images: [
       "/produtos/polos/polo-3.jpeg",
       "/produtos/polos/polo-1.jpeg",
@@ -40,6 +41,7 @@ export const mockProducts: Product[] = [
     featured: true,
     active: true,
     sold_out: false,
+    stock_quantity: 1,
     images: [
       "/produtos/polos/polo-12.jpeg",
       "/produtos/polos/polo-9.jpeg",
@@ -63,6 +65,7 @@ export const mockProducts: Product[] = [
     featured: false,
     active: true,
     sold_out: false,
+    stock_quantity: 1,
     images: [
       "/produtos/polos/polo-5.jpeg",
       "/produtos/polos/polo-6.jpeg",

@@ -13,6 +13,8 @@ type Props = {
 
 export function CartItem({ item, onRemove, onQuantity }: Props) {
   const subtotal = item.product.price * item.quantity;
+  const maxQuantity = item.product.stock_quantity;
+  const reachedStockLimit = item.quantity >= maxQuantity;
 
   return (
     <div className="grid self-start grid-cols-[92px_1fr] gap-4 rounded-md border border-neutral-200 bg-white p-3 sm:grid-cols-[120px_1fr_auto]">
@@ -26,12 +28,13 @@ export function CartItem({ item, onRemove, onQuantity }: Props) {
         <p className="font-bold text-brand">
           {formatPrice(item.product.price)} · Subtotal {formatPrice(subtotal)}
         </p>
+        {reachedStockLimit ? <p className="text-xs font-bold text-red-600">Quantidade máxima disponível em estoque.</p> : null}
       </div>
       <div className="col-span-2 flex items-center justify-between gap-3 sm:col-span-1 sm:flex-col sm:items-end">
         <div className="flex h-10 items-center rounded-md border border-neutral-300 bg-white">
           <button
             type="button"
-            className="focus-ring flex h-10 w-10 items-center justify-center"
+            className="focus-ring flex h-10 w-10 items-center justify-center disabled:cursor-not-allowed disabled:text-neutral-300"
             onClick={() => onQuantity(item.product.id, item.size, item.quantity - 1)}
             aria-label="Diminuir quantidade"
           >
@@ -42,6 +45,7 @@ export function CartItem({ item, onRemove, onQuantity }: Props) {
             type="button"
             className="focus-ring flex h-10 w-10 items-center justify-center"
             onClick={() => onQuantity(item.product.id, item.size, item.quantity + 1)}
+            disabled={reachedStockLimit}
             aria-label="Aumentar quantidade"
           >
             <Plus size={16} />

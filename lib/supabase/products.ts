@@ -19,7 +19,25 @@ export function validateProductInput(input: ProductWriteInput) {
     return "Informe um slug válido.";
   }
 
+  if ("stock_quantity" in input && (!Number.isInteger(Number(input.stock_quantity)) || Number(input.stock_quantity) < 0)) {
+    return "Informe uma quantidade em estoque igual ou maior que zero.";
+  }
+
   return null;
+}
+
+function normalizeProductInput<T extends ProductWriteInput>(input: T) {
+  const stockQuantity = "stock_quantity" in input ? Number(input.stock_quantity) : undefined;
+
+  return {
+    ...input,
+    ...(stockQuantity !== undefined
+      ? {
+          stock_quantity: stockQuantity,
+          sold_out: stockQuantity === 0 ? true : input.sold_out ?? false
+        }
+      : {})
+  };
 }
 
 function friendlyProductError(error: { code?: string; message?: string }) {
@@ -87,7 +105,7 @@ export async function createProduct(input: ProductInput) {
   const validationError = validateProductInput(input);
   if (validationError) throw new Error(validationError);
 
-  const { data, error } = await supabaseAdmin.from(table).insert(input).select().single();
+  const { data, error } = await supabaseAdmin.from(table).insert(normalizeProductInput(input)).select().single();
   if (error) throw friendlyProductError(error);
   return data as Product;
 }
@@ -100,7 +118,7 @@ export async function updateProduct(id: string, input: ProductInput) {
 
   const { data, error } = await supabaseAdmin
     .from(table)
-    .update({ ...input, updated_at: new Date().toISOString() })
+    .update({ ...normalizeProductInput(input), updated_at: new Date().toISOString() })
     .eq("id", id)
     .select()
     .single();
@@ -124,7 +142,7 @@ export async function patchProduct(id: string, input: Partial<Product>) {
 
   const { data, error } = await supabaseAdmin
     .from(table)
-    .update({ ...input, updated_at: new Date().toISOString() })
+    .update({ ...normalizeProductInput(input), updated_at: new Date().toISOString() })
     .eq("id", id)
     .select()
     .single();

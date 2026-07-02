@@ -36,11 +36,14 @@ export function ProductTable({ products, onDelete, onToggleActive, onToggleFeatu
             <p className="text-sm text-neutral-500">
               {product.category} · {formatPrice(product.price)}
             </p>
+            <p className="text-sm font-semibold text-neutral-500">
+              Estoque: {product.stock_quantity === 0 ? "Esgotado" : product.stock_quantity}
+            </p>
             <div className="mt-2 flex flex-wrap gap-2 text-xs font-black uppercase">
               <span className={product.active ? "text-brand" : "text-red-600"}>
                 {product.active ? "Ativo" : "Inativo"}
               </span>
-              {product.sold_out ? <span className="text-red-600">Esgotado</span> : null}
+              {product.sold_out || product.stock_quantity === 0 ? <span className="text-red-600">Esgotado</span> : null}
               {product.featured ? <span className="text-brand">Destaque</span> : null}
             </div>
           </div>

@@ -7,7 +7,9 @@ import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useCart } from "@/hooks/useCart";
+import { useCoupon } from "@/hooks/useCoupon";
 import { formatPrice } from "@/lib/formatters";
+import { calculateInstallments } from "@/lib/installments";
 import { formatShippingOption, shippingMessage, storeShippingEstimate } from "@/lib/shipping";
 import type { CheckoutData } from "@/types/checkout";
 import type { ShippingEstimate } from "@/types/shipping";
@@ -41,6 +43,7 @@ function isShippingEstimate(value: ShippingEstimate | { error?: string }): value
 
 export default function EntregaPage() {
   const { items, total } = useCart();
+  const { coupon, code, setCode, loading: loadingCoupon, error: couponError, applyCoupon, removeCoupon } = useCoupon(total);
   const [form, setForm] = useState(initialForm);
   const [cepStatus, setCepStatus] = useState("");
   const [loadingCep, setLoadingCep] = useState(false);
@@ -54,7 +57,11 @@ export default function EntregaPage() {
     () => shipping?.options.find((option) => option.service === shipping.selectedService) ?? null,
     [shipping]
   );
-  const finalTotal = total + (selectedShipping?.price ?? 0);
+  const discountAmount = coupon?.discountAmount ?? 0;
+  const discountedSubtotal = Math.max(0, total - discountAmount);
+  const finalTotal = discountedSubtotal + (selectedShipping?.price ?? 0);
+  const installments = calculateInstallments(finalTotal);
+  const bestInstallment = installments[installments.length - 1];
 
   function updateField(field: keyof CheckoutData, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -185,7 +192,8 @@ export default function EntregaPage() {
           shipping: {
             service: selectedShipping.service,
             price: selectedShipping.price
-          }
+          },
+          couponCode: coupon?.code ?? null
         })
       });
       const data = (await response.json()) as { checkout_url?: string; link?: string; error?: string };
@@ -307,6 +315,12 @@ export default function EntregaPage() {
                   <span className="font-black uppercase text-neutral-700">Subtotal</span>
                   <span className="font-semibold text-neutral-950">{formatPrice(total)}</span>
                 </div>
+                {coupon ? (
+                  <div className="flex items-center justify-between text-emerald-700">
+                    <span className="font-black uppercase">Cupom {coupon.code}</span>
+                    <span className="font-semibold">-{formatPrice(discountAmount)}</span>
+                  </div>
+                ) : null}
                 <div className="flex items-center justify-between">
                   <span className="font-black uppercase text-neutral-700">
                     {selectedShipping ? `Frete ${selectedShipping.service}` : "Frete"}
@@ -320,6 +334,31 @@ export default function EntregaPage() {
                   <span className="font-display text-2xl font-black text-brand">{formatPrice(finalTotal)}</span>
                 </div>
               </div>
+              <div className="mt-5 rounded-md border border-neutral-200 bg-white p-3">
+                <label className="text-xs font-black uppercase text-neutral-500" htmlFor="checkout-coupon">
+                  Cupom de desconto
+                </label>
+                {coupon ? (
+                  <div className="mt-3 rounded-md bg-emerald-50 p-3 text-sm font-bold text-emerald-800">
+                    <p>Cupom {coupon.code} aplicado</p>
+                    <p>Desconto: -{formatPrice(discountAmount)}</p>
+                    <button type="button" onClick={removeCoupon} className="mt-2 text-xs font-black uppercase underline underline-offset-4">
+                      Remover cupom
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mt-2 flex gap-2">
+                    <Input id="checkout-coupon" value={code} onChange={(event) => setCode(event.target.value)} placeholder="DESAPEGO10" />
+                    <Button type="button" onClick={applyCoupon} disabled={loadingCoupon || !code.trim()}>
+                      {loadingCoupon ? "..." : "Aplicar"}
+                    </Button>
+                  </div>
+                )}
+                {couponError ? <p className="mt-2 text-xs font-bold text-red-600">{couponError}</p> : null}
+              </div>
+              <p className="mt-4 text-xs font-bold leading-5 text-neutral-600">
+                Parcelamento: {bestInstallment.label} de {bestInstallment.formattedInstallmentAmount} sobre o total com desconto.
+              </p>
               {submitError ? <p className="mt-4 text-sm font-semibold text-red-600">{submitError}</p> : null}
               <Button type="submit" className="mt-6 w-full gap-2" disabled={loadingPayment}>
                 <CreditCard size={18} />

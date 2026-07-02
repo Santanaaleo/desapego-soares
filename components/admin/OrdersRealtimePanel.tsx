@@ -181,6 +181,7 @@ export function OrdersRealtimePanel({ initialOrders, selectedStatus }: Props) {
                 <div>
                   <p className="text-xs font-black uppercase text-neutral-500">Total</p>
                   <p className="font-black text-neutral-950">{formatPrice(order.total)}</p>
+                  {order.coupon_code ? <p className="text-xs font-bold text-emerald-700">Cupom {order.coupon_code}</p> : null}
                 </div>
                 <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase ${orderStatusBadgeClasses[order.status]}`}>
                   {orderStatusLabels[order.status]}

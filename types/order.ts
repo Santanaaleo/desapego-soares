@@ -54,6 +54,8 @@ export type Order = {
   state: string;
   subtotal: number;
   shipping: number;
+  coupon_code: string | null;
+  discount_amount: number;
   total: number;
   created_at: string;
   updated_at: string;

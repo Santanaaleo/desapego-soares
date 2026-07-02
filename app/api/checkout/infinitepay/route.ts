@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { validateActiveCoupon } from "@/lib/supabase/coupons";
 import { calculateShippingWithSuperFrete, cleanCep } from "@/lib/superfrete";
 
 type CheckoutItemInput = {
@@ -29,6 +30,7 @@ type CheckoutRequest = {
     service?: string;
     price?: number;
   };
+  couponCode?: string | null;
 };
 
 type ProductRow = {
@@ -173,8 +175,38 @@ export async function POST(request: Request) {
   }
 
   const shippingPrice = money(selectedShipping.price);
-  const total = money(subtotal + shippingPrice);
+  const coupon = body.couponCode ? await validateActiveCoupon(body.couponCode, subtotal) : null;
+  const discountAmount = coupon ? money(coupon.discountAmount) : 0;
+  const discountedSubtotal = money(Math.max(0, subtotal - discountAmount));
+  const total = money(discountedSubtotal + shippingPrice);
+
+  if (body.couponCode && !coupon) {
+    return badRequest("Cupom inválido ou expirado.");
+  }
+
+  if (total <= 0) {
+    return badRequest("Total inválido para finalizar o checkout.");
+  }
+
   const orderNsu = crypto.randomUUID();
+  const itemDiscountCents = orderItems.reduce<number[]>((discounts, item, index) => {
+    if (discountAmount <= 0) {
+      return [...discounts, 0];
+    }
+
+    const previousDiscount = discounts.reduce((sum, value) => sum + value, 0);
+    const itemDiscount =
+      index === orderItems.length - 1
+        ? cents(discountAmount) - previousDiscount
+        : Math.min(cents(item.subtotal), Math.round((item.subtotal / subtotal) * cents(discountAmount)));
+
+    return [...discounts, itemDiscount];
+  }, []);
+
+  const payableItems = orderItems.map((item, index) => ({
+    ...item,
+    payableSubtotalCents: Math.max(0, cents(item.subtotal) - itemDiscountCents[index])
+  }));
 
   const { data: order, error: orderError } = await supabaseAdmin
     .from("orders")
@@ -194,7 +226,9 @@ export async function POST(request: Request) {
       state: clean(address.state),
       subtotal,
       shipping: shippingPrice,
-      total
+      total,
+      coupon_code: coupon?.code ?? null,
+      discount_amount: discountAmount
     })
     .select("id,order_nsu")
     .single();
@@ -221,10 +255,10 @@ export async function POST(request: Request) {
     handle,
     order_nsu: order.order_nsu,
     items: [
-      ...orderItems.map((item) => ({
-        quantity: item.quantity,
-        price: cents(item.unit_price),
-        description: item.product_name
+      ...payableItems.map((item) => ({
+        quantity: 1,
+        price: item.payableSubtotalCents,
+        description: item.quantity > 1 ? `${item.quantity}x ${item.product_name}` : item.product_name
       })),
       {
         quantity: 1,

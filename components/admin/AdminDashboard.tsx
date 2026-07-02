@@ -22,6 +22,9 @@ export function AdminDashboard() {
             <Button href="/admin/pedidos" variant="secondary">
               Pedidos
             </Button>
+            <Button href="/admin/cupons" variant="secondary">
+              Cupons
+            </Button>
             <Button href="/admin/produtos/novo" className="gap-2">
               <Plus size={18} />
               Novo Produto

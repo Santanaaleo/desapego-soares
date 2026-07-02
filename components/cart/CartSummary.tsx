@@ -3,14 +3,19 @@
 import { Truck } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { useCoupon } from "@/hooks/useCoupon";
 import { formatPrice } from "@/lib/formatters";
 import { calculateInstallments } from "@/lib/installments";
 import type { CartItem } from "@/types/cart";
 
 export function CartSummary({ items, total }: { items: CartItem[]; total: number }) {
   const [showInstallments, setShowInstallments] = useState(false);
+  const { coupon, code, setCode, loading, error, applyCoupon, removeCoupon } = useCoupon(total);
   const disabled = items.length === 0;
-  const installments = calculateInstallments(total);
+  const discountAmount = coupon?.discountAmount ?? 0;
+  const discountedTotal = Math.max(0, total - discountAmount);
+  const installments = calculateInstallments(discountedTotal);
   const bestInstallment = installments[installments.length - 1];
 
   return (
@@ -27,10 +32,46 @@ export function CartSummary({ items, total }: { items: CartItem[]; total: number
           </div>
         ))}
       </div>
-      <div className="mt-5 flex items-center justify-between border-t border-neutral-200 pt-5">
-        <span className="font-black uppercase text-neutral-700">Subtotal</span>
-        <span className="font-display text-2xl font-black text-brand">{formatPrice(total)}</span>
+      <div className="mt-5 grid gap-3 border-t border-neutral-200 pt-5">
+        <div className="flex items-center justify-between">
+          <span className="font-black uppercase text-neutral-700">Subtotal</span>
+          <span className="font-semibold text-neutral-950">{formatPrice(total)}</span>
+        </div>
+        {coupon ? (
+          <div className="flex items-center justify-between text-emerald-700">
+            <span className="font-black uppercase">Desconto</span>
+            <span className="font-semibold">-{formatPrice(discountAmount)}</span>
+          </div>
+        ) : null}
+        <div className="flex items-center justify-between border-t border-neutral-200 pt-3">
+          <span className="font-black uppercase text-neutral-700">Total produtos</span>
+          <span className="font-display text-2xl font-black text-brand">{formatPrice(discountedTotal)}</span>
+        </div>
       </div>
+
+      <div className="mt-5 rounded-md border border-neutral-200 bg-white p-3">
+        <label className="text-xs font-black uppercase text-neutral-500" htmlFor="cart-coupon">
+          Cupom de desconto
+        </label>
+        {coupon ? (
+          <div className="mt-3 rounded-md bg-emerald-50 p-3 text-sm font-bold text-emerald-800">
+            <p>Cupom {coupon.code} aplicado</p>
+            <p>Desconto: -{formatPrice(discountAmount)}</p>
+            <button type="button" onClick={removeCoupon} className="mt-2 text-xs font-black uppercase underline underline-offset-4">
+              Remover cupom
+            </button>
+          </div>
+        ) : (
+          <div className="mt-2 flex gap-2">
+            <Input id="cart-coupon" value={code} onChange={(event) => setCode(event.target.value)} placeholder="DESAPEGO10" />
+            <Button type="button" onClick={applyCoupon} disabled={loading || !code.trim()}>
+              {loading ? "..." : "Aplicar"}
+            </Button>
+          </div>
+        )}
+        {error ? <p className="mt-2 text-xs font-bold text-red-600">{error}</p> : null}
+      </div>
+
       <section className="relative mt-3 rounded-md border border-neutral-200 bg-white px-3 py-2">
         <div className="flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
           <div>

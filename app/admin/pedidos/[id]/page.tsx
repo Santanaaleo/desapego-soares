@@ -134,6 +134,12 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
                 <span>Frete</span>
                 <strong>{formatPrice(order.shipping)}</strong>
               </div>
+              {order.coupon_code ? (
+                <div className="flex justify-between gap-4 text-emerald-700">
+                  <span>Cupom {order.coupon_code}</span>
+                  <strong>-{formatPrice(order.discount_amount)}</strong>
+                </div>
+              ) : null}
               <div className="flex justify-between gap-4 border-t border-neutral-200 pt-3 text-base">
                 <span className="font-black uppercase">Total</span>
                 <strong className="text-brand">{formatPrice(order.total)}</strong>

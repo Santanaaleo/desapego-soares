@@ -12,10 +12,11 @@ type FormState = {
   id?: string;
   code: string;
   discountPercent: string;
+  usageLimit: string;
   active: boolean;
 };
 
-const emptyForm: FormState = { code: "", discountPercent: "", active: true };
+const emptyForm: FormState = { code: "", discountPercent: "", usageLimit: "", active: true };
 
 export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
   const [coupons, setCoupons] = useState(initialCoupons);
@@ -42,6 +43,7 @@ export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
         body: JSON.stringify({
           code: form.code,
           discountPercent: Number(form.discountPercent),
+          usageLimit: form.usageLimit.trim() ? Number(form.usageLimit) : null,
           active: form.active
         })
       });
@@ -67,6 +69,7 @@ export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
       id: coupon.id,
       code: coupon.code,
       discountPercent: String(coupon.discount_percent),
+      usageLimit: coupon.usage_limit === null ? "" : String(coupon.usage_limit),
       active: coupon.active
     });
     setMessage("");
@@ -87,6 +90,12 @@ export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
         body: JSON.stringify({
           code: changes.code ?? coupon.code,
           discountPercent: Number(changes.discountPercent ?? coupon.discount_percent),
+          usageLimit:
+            changes.usageLimit !== undefined
+              ? changes.usageLimit.trim()
+                ? Number(changes.usageLimit)
+                : null
+              : coupon.usage_limit,
           active: changes.active ?? coupon.active
         })
       });
@@ -168,6 +177,16 @@ export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
                 onChange={(event) => setForm((current) => ({ ...current, discountPercent: event.target.value }))}
                 placeholder="10"
               />
+              <label className="text-xs font-black uppercase text-neutral-500" htmlFor="coupon-usage-limit">Limite de usos</label>
+              <Input
+                id="coupon-usage-limit"
+                min="1"
+                step="1"
+                type="number"
+                value={form.usageLimit}
+                onChange={(event) => setForm((current) => ({ ...current, usageLimit: event.target.value }))}
+                placeholder="Vazio = ilimitado"
+              />
               <label className="flex items-center gap-3 text-sm font-bold text-neutral-700">
                 <input
                   type="checkbox"
@@ -193,6 +212,9 @@ export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
                   <div>
                     <p className="font-black text-neutral-950">{coupon.code}</p>
                     <p className="text-sm font-semibold text-neutral-500">Desconto: {coupon.discount_percent}%</p>
+                    <p className="text-sm font-semibold text-neutral-500">
+                      Usos atuais: {coupon.usage_count} / {coupon.usage_limit ?? "ilimitado"}
+                    </p>
                   </div>
                   <span className={`w-fit rounded-full px-3 py-1 text-xs font-black uppercase ${coupon.active ? "bg-emerald-100 text-emerald-800" : "bg-neutral-200 text-neutral-600"}`}>
                     {coupon.active ? "Ativo" : "Inativo"}

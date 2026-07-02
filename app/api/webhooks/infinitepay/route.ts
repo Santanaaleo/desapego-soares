@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { incrementCouponUsage } from "@/lib/supabase/coupons";
 import { getOrderByOrderNsu, markOrderPaidByOrderNsu } from "@/lib/supabase/orders";
 
 type InfinitePayWebhookPayload = {
@@ -85,6 +86,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "Valor pago inválido." }, { status: 400 });
     }
 
+    const wasAlreadyPaid = existingOrder.status === "paid";
     const order = await markOrderPaidByOrderNsu({
       orderNsu,
       transactionNsu: clean(payload.transaction_nsu),
@@ -96,6 +98,10 @@ export async function POST(request: Request) {
     if (!order) {
       console.error("[infinitepay:webhook] Pedido não atualizado:", { order_nsu: orderNsu });
       return NextResponse.json({ ok: false, error: "Pedido não atualizado." }, { status: 500 });
+    }
+
+    if (!wasAlreadyPaid && existingOrder.coupon_code) {
+      await incrementCouponUsage(existingOrder.coupon_code);
     }
 
     console.info("[infinitepay:webhook] Pedido atualizado:", { id: order.id, order_nsu: order.order_nsu, status: order.status });

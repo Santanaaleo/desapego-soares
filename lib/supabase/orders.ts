@@ -83,8 +83,8 @@ export async function markOrderPaidByOrderNsu(input: {
       updated_at: new Date().toISOString()
     })
     .eq("order_nsu", input.orderNsu)
-    .select("id,order_nsu,status")
+    .select("id,order_nsu,status,coupon_code")
     .maybeSingle();
   if (error) throw error;
-  return data as Pick<Order, "id" | "order_nsu" | "status"> | null;
+  return data as Pick<Order, "id" | "order_nsu" | "status" | "coupon_code"> | null;
 }

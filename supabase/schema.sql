@@ -38,6 +38,21 @@ create table if not exists coupons (
 
 create index if not exists coupons_active_idx on coupons (active);
 
+alter table coupons
+  add column if not exists usage_limit integer,
+  add column if not exists usage_count integer not null default 0;
+
+alter table coupons
+  add constraint coupons_usage_limit_check check (
+    usage_limit is null
+    or usage_limit > 0
+  );
+
+alter table coupons
+  add constraint coupons_usage_count_check check (usage_count >= 0);
+
+create index if not exists coupons_usage_limit_idx on coupons (usage_limit);
+
 alter table orders
   add column if not exists coupon_code text,
   add column if not exists discount_amount numeric(10,2) not null default 0;

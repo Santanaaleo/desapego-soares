@@ -11,11 +11,12 @@ export async function PUT(request: Request, { params }: Params) {
   await requireAdmin("/admin/cupons");
 
   try {
-    const body = (await request.json()) as { code?: string; discountPercent?: number; active?: boolean };
+    const body = (await request.json()) as { code?: string; discountPercent?: number; active?: boolean; usageLimit?: number | null };
     const coupon = await updateCouponForAdmin(id, {
       code: body.code ?? "",
       discountPercent: Number(body.discountPercent),
-      active: Boolean(body.active)
+      active: Boolean(body.active),
+      usageLimit: body.usageLimit ?? null
     });
     return NextResponse.json(coupon);
   } catch (error) {

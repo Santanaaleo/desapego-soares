@@ -18,11 +18,12 @@ export async function POST(request: Request) {
   await requireAdmin("/admin/cupons");
 
   try {
-    const body = (await request.json()) as { code?: string; discountPercent?: number; active?: boolean };
+    const body = (await request.json()) as { code?: string; discountPercent?: number; active?: boolean; usageLimit?: number | null };
     const coupon = await createCouponForAdmin({
       code: body.code ?? "",
       discountPercent: Number(body.discountPercent),
-      active: Boolean(body.active)
+      active: Boolean(body.active),
+      usageLimit: body.usageLimit ?? null
     });
     return NextResponse.json(coupon, { status: 201 });
   } catch (error) {

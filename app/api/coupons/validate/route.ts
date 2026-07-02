@@ -11,7 +11,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(coupon);
-  } catch {
-    return NextResponse.json({ error: "Cupom inválido ou expirado." }, { status: 400 });
+  } catch (error) {
+    const message = error instanceof Error && error.message === "Cupom esgotado." ? error.message : "Cupom inválido ou expirado.";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }

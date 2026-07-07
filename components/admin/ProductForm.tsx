@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { categories } from "@/lib/constants";
-import { slugify } from "@/lib/formatters";
+import { formatPrice, slugify } from "@/lib/formatters";
 import type { Product, ProductInput } from "@/types/product";
 import { ImageUpload } from "./ImageUpload";
 
@@ -31,6 +31,18 @@ export function ProductForm({ product, onSubmit }: Props) {
   const [error, setError] = useState("");
 
   const slug = useMemo(() => slugify(name), [name]);
+  const previewPrice = parsePrice(price);
+  const previewCompareAtPrice = compareAtPrice.trim() ? parsePrice(compareAtPrice) : null;
+  const hasInvalidSalePrice =
+    saleActive &&
+    previewCompareAtPrice !== null &&
+    Number.isFinite(previewPrice) &&
+    previewCompareAtPrice <= previewPrice;
+  const previewSavings =
+    saleActive && previewCompareAtPrice !== null && Number.isFinite(previewPrice) && previewCompareAtPrice > previewPrice
+      ? previewCompareAtPrice - previewPrice
+      : null;
+  const previewPercentOff = previewSavings && previewCompareAtPrice ? Math.round((previewSavings / previewCompareAtPrice) * 100) : null;
 
   function parsePrice(value: string) {
     const normalized = value.trim().replace(/\./g, "").replace(",", ".");
@@ -65,8 +77,13 @@ export function ProductForm({ product, onSubmit }: Props) {
       return;
     }
 
-    if (numericCompareAtPrice !== null && (!Number.isFinite(numericCompareAtPrice) || numericCompareAtPrice <= 0)) {
+    if (saleActive && numericCompareAtPrice !== null && (!Number.isFinite(numericCompareAtPrice) || numericCompareAtPrice <= 0)) {
       setError("Informe um preço antigo maior que zero ou deixe o campo vazio.");
+      return;
+    }
+
+    if (saleActive && numericCompareAtPrice !== null && numericCompareAtPrice <= numericPrice) {
+      setError("O preço antigo precisa ser maior que o preço atual.");
       return;
     }
 
@@ -125,20 +142,43 @@ export function ProductForm({ product, onSubmit }: Props) {
       </div>
 
       <div className="grid gap-3 rounded-md border border-neutral-200 bg-neutral-50 p-4">
-        <p className="text-sm font-black uppercase text-neutral-950">Promoção</p>
-        <label className="flex items-center gap-2 text-sm font-bold">
+        <p className="text-sm font-black uppercase text-neutral-950">Promoção opcional</p>
+        <label className="flex items-center gap-2 text-sm font-bold text-neutral-950">
           <input type="checkbox" checked={saleActive} onChange={(event) => setSaleActive(event.target.checked)} />
-          Oferta ativa?
+          Este produto está em promoção
         </label>
-        <Input
-          value={compareAtPrice}
-          onChange={(event) => setCompareAtPrice(event.target.value)}
-          placeholder="Preço antigo / preço de comparação"
-          inputMode="decimal"
-        />
-        <p className="text-xs font-bold text-neutral-500">
-          A promoção só aparece se a oferta estiver ativa e o preço antigo for maior que o preço atual.
-        </p>
+        {saleActive ? (
+          <div className="grid gap-3">
+            <div className="grid gap-2">
+              <label className="text-xs font-black uppercase text-neutral-700" htmlFor="compare-at-price">
+                Preço antigo
+              </label>
+              <Input
+                id="compare-at-price"
+                value={compareAtPrice}
+                onChange={(event) => setCompareAtPrice(event.target.value)}
+                placeholder="Digite o valor original antes da promoção"
+                inputMode="decimal"
+              />
+              <p className="text-xs font-bold leading-5 text-neutral-500">
+                Se o produto custa R$ 199,90 e antes custava R$ 299,90, coloque 299,90 aqui.
+              </p>
+            </div>
+            {hasInvalidSalePrice ? (
+              <p className="rounded-md border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-700">
+                O preço antigo precisa ser maior que o preço atual.
+              </p>
+            ) : null}
+            {previewPercentOff ? (
+              <div className="rounded-md border border-neutral-200 bg-white p-3 text-sm">
+                <p className="mb-2 text-xs font-black uppercase text-neutral-500">Como aparecerá na loja:</p>
+                <p className="text-neutral-500">De: {formatPrice(previewCompareAtPrice!)}</p>
+                <p className="font-black text-neutral-950">Por: {formatPrice(previewPrice)}</p>
+                <p className="font-black text-brand">{previewPercentOff}% OFF</p>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-3">

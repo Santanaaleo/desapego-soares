@@ -17,6 +17,8 @@ export function ProductForm({ product, onSubmit }: Props) {
   const [name, setName] = useState(product?.name || "");
   const [description, setDescription] = useState(product?.description || "");
   const [price, setPrice] = useState(product?.price.toString() || "");
+  const [compareAtPrice, setCompareAtPrice] = useState(product?.compare_at_price?.toString() || "");
+  const [saleActive, setSaleActive] = useState(product?.sale_active ?? false);
   const [category, setCategory] = useState<ProductInput["category"]>(product?.category || "Polos");
   const [brand, setBrand] = useState(product?.brand || "");
   const [sizesText, setSizesText] = useState(product?.sizes.join(", ") || "");
@@ -45,6 +47,7 @@ export function ProductForm({ product, onSubmit }: Props) {
       .map((size) => size.trim())
       .filter(Boolean);
     const numericPrice = parsePrice(price);
+    const numericCompareAtPrice = compareAtPrice.trim() ? parsePrice(compareAtPrice) : null;
     const numericStock = Number(stockQuantity);
 
     if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
@@ -62,6 +65,11 @@ export function ProductForm({ product, onSubmit }: Props) {
       return;
     }
 
+    if (numericCompareAtPrice !== null && (!Number.isFinite(numericCompareAtPrice) || numericCompareAtPrice <= 0)) {
+      setError("Informe um preço antigo maior que zero ou deixe o campo vazio.");
+      return;
+    }
+
     setError("");
 
     onSubmit({
@@ -69,6 +77,8 @@ export function ProductForm({ product, onSubmit }: Props) {
       slug,
       description,
       price: numericPrice,
+      compare_at_price: numericCompareAtPrice,
+      sale_active: saleActive,
       category,
       brand,
       sizes,
@@ -112,6 +122,23 @@ export function ProductForm({ product, onSubmit }: Props) {
           onChange={(event) => setStockQuantity(event.target.value)}
           placeholder="Quantidade em estoque"
         />
+      </div>
+
+      <div className="grid gap-3 rounded-md border border-neutral-200 bg-neutral-50 p-4">
+        <p className="text-sm font-black uppercase text-neutral-950">Promoção</p>
+        <label className="flex items-center gap-2 text-sm font-bold">
+          <input type="checkbox" checked={saleActive} onChange={(event) => setSaleActive(event.target.checked)} />
+          Oferta ativa?
+        </label>
+        <Input
+          value={compareAtPrice}
+          onChange={(event) => setCompareAtPrice(event.target.value)}
+          placeholder="Preço antigo / preço de comparação"
+          inputMode="decimal"
+        />
+        <p className="text-xs font-bold text-neutral-500">
+          A promoção só aparece se a oferta estiver ativa e o preço antigo for maior que o preço atual.
+        </p>
       </div>
 
       <div className="grid gap-3">

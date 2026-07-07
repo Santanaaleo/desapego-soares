@@ -3,6 +3,7 @@
 import { Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { formatPrice } from "@/lib/formatters";
+import { getProductSale } from "@/lib/product-pricing";
 import type { CartItem as CartItemType } from "@/types/cart";
 
 type Props = {
@@ -15,6 +16,7 @@ export function CartItem({ item, onRemove, onQuantity }: Props) {
   const subtotal = item.product.price * item.quantity;
   const maxQuantity = item.product.stock_quantity;
   const reachedStockLimit = item.quantity >= maxQuantity;
+  const sale = getProductSale(item.product);
 
   return (
     <div className="grid self-start grid-cols-[92px_1fr] gap-4 rounded-md border border-neutral-200 bg-white p-3 sm:grid-cols-[120px_1fr_auto]">
@@ -25,9 +27,19 @@ export function CartItem({ item, onRemove, onQuantity }: Props) {
         <p className="font-display text-base font-black uppercase text-neutral-950">{item.product.name}</p>
         <p className="text-xs font-bold uppercase text-neutral-500">{item.product.brand}</p>
         {item.size ? <p className="text-sm font-bold text-neutral-700">Tamanho: {item.size}</p> : null}
-        <p className="font-bold text-brand">
-          {formatPrice(item.product.price)} · Subtotal {formatPrice(subtotal)}
-        </p>
+        <div className="grid gap-0.5">
+          {sale ? (
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-neutral-400 line-through">{formatPrice(sale.compareAtPrice)}</span>
+              <span className="rounded-full bg-brand-mist px-2 py-0.5 text-[10px] font-black uppercase text-brand">
+                {sale.percentOff}% OFF
+              </span>
+            </div>
+          ) : null}
+          <p className="font-bold text-brand">
+            {formatPrice(item.product.price)} · Subtotal {formatPrice(subtotal)}
+          </p>
+        </div>
         {reachedStockLimit ? <p className="text-xs font-bold text-red-600">Quantidade máxima disponível em estoque.</p> : null}
       </div>
       <div className="col-span-2 flex items-center justify-between gap-3 sm:col-span-1 sm:flex-col sm:items-end">

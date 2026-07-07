@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { addProductToCart, cartStorageKey } from "@/lib/cart";
 import { formatPrice } from "@/lib/formatters";
 import { calculateBestInstallment } from "@/lib/installments";
+import { getProductSale } from "@/lib/product-pricing";
 import type { CartItem } from "@/types/cart";
 import type { Product } from "@/types/product";
 
@@ -17,6 +18,7 @@ export function ProductDetails({ product }: { product: Product }) {
   const availableSizes = product.sizes.filter(Boolean);
   const bestInstallment = calculateBestInstallment(product.price);
   const unavailable = product.sold_out || product.stock_quantity <= 0;
+  const sale = getProductSale(product);
 
   function addToCart() {
     if (unavailable) {
@@ -65,7 +67,16 @@ export function ProductDetails({ product }: { product: Product }) {
       </div>
 
       <div>
+        {sale ? (
+          <div className="mb-1 flex flex-wrap items-center gap-2">
+            <span className="text-sm font-semibold text-neutral-400 line-through">{formatPrice(sale.compareAtPrice)}</span>
+            <span className="rounded-full bg-brand-mist px-2.5 py-1 text-xs font-black uppercase text-brand">
+              {sale.percentOff}% OFF
+            </span>
+          </div>
+        ) : null}
         <p className="font-display text-3xl font-extrabold text-neutral-950">{formatPrice(product.price)}</p>
+        {sale ? <p className="mt-1 text-sm font-bold text-brand">Economize {formatPrice(sale.savings)}</p> : null}
         <p className="mt-1 text-sm font-semibold text-neutral-600">
           ou {bestInstallment.label} de {bestInstallment.formattedInstallmentAmount} no cartão
         </p>

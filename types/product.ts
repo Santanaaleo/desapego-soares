@@ -6,6 +6,8 @@ export type Product = {
   slug: string;
   description: string;
   price: number;
+  compare_at_price: number | null;
+  sale_active: boolean;
   category: ProductCategory;
   brand: string;
   sizes: string[];

@@ -13,10 +13,19 @@ function readLocalProducts() {
 
   try {
     const stored = window.localStorage.getItem(storageKey);
-    return stored ? (JSON.parse(stored) as Product[]) : mockProducts;
+    const products = stored ? (JSON.parse(stored) as Product[]) : mockProducts;
+    return products.map(normalizeLocalProduct);
   } catch {
     return mockProducts;
   }
+}
+
+function normalizeLocalProduct(product: Product) {
+  return {
+    ...product,
+    compare_at_price: product.compare_at_price ?? null,
+    sale_active: product.sale_active ?? false
+  };
 }
 
 function writeLocalProducts(products: Product[]) {

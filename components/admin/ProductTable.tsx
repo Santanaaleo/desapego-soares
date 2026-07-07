@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Edit, Star, Trash2 } from "lucide-react";
 import { formatPrice } from "@/lib/formatters";
+import { getProductSale } from "@/lib/product-pricing";
 import type { Product } from "@/types/product";
 
 type Props = {
@@ -16,11 +17,14 @@ type Props = {
 export function ProductTable({ products, onDelete, onToggleActive, onToggleFeatured }: Props) {
   return (
     <div className="overflow-hidden rounded-md border border-neutral-100 bg-white shadow-sm">
-      {products.map((product) => (
-        <div
-          key={product.id}
-          className="grid grid-cols-[72px_1fr] gap-4 border-b border-neutral-100 p-3 last:border-b-0 lg:grid-cols-[72px_1fr_auto]"
-        >
+      {products.map((product) => {
+        const sale = getProductSale(product);
+
+        return (
+          <div
+            key={product.id}
+            className="grid grid-cols-[72px_1fr] gap-4 border-b border-neutral-100 p-3 last:border-b-0 lg:grid-cols-[72px_1fr_auto]"
+          >
           <div className="relative aspect-square overflow-hidden rounded-md bg-brand-mist">
             <Image
               src={product.images[0]}
@@ -35,6 +39,7 @@ export function ProductTable({ products, onDelete, onToggleActive, onToggleFeatu
             <p className="font-bold text-neutral-950">{product.name}</p>
             <p className="text-sm text-neutral-500">
               {product.category} · {formatPrice(product.price)}
+              {sale ? ` · ${sale.percentOff}% OFF` : ""}
             </p>
             <p className="text-sm font-semibold text-neutral-500">
               Estoque: {product.stock_quantity === 0 ? "Esgotado" : product.stock_quantity}
@@ -83,8 +88,9 @@ export function ProductTable({ products, onDelete, onToggleActive, onToggleFeatu
               <Trash2 size={18} />
             </button>
           </div>
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 }

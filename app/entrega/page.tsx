@@ -10,6 +10,7 @@ import { useCart } from "@/hooks/useCart";
 import { useCoupon } from "@/hooks/useCoupon";
 import { formatPrice } from "@/lib/formatters";
 import { calculateInstallments } from "@/lib/installments";
+import { getProductSale } from "@/lib/product-pricing";
 import { formatShippingOption, shippingMessage, storeShippingEstimate } from "@/lib/shipping";
 import type { CheckoutData } from "@/types/checkout";
 import type { ShippingEstimate } from "@/types/shipping";
@@ -300,15 +301,20 @@ export default function EntregaPage() {
             <aside className="h-fit rounded-md border border-neutral-200 bg-neutral-50 p-5">
               <h2 className="font-display text-xl font-black uppercase text-neutral-950">Resumo</h2>
               <div className="mt-4 grid gap-2 text-sm text-neutral-700">
-                {items.map((item) => (
-                  <div key={`${item.product.id}-${item.size}`} className="flex justify-between gap-3">
-                    <span>
-                      {item.quantity}x {item.product.name}
-                      {item.size ? ` · ${item.size}` : ""}
-                    </span>
-                    <strong>{formatPrice(item.product.price * item.quantity)}</strong>
-                  </div>
-                ))}
+                {items.map((item) => {
+                  const sale = getProductSale(item.product);
+
+                  return (
+                    <div key={`${item.product.id}-${item.size}`} className="flex justify-between gap-3">
+                      <span>
+                        {item.quantity}x {item.product.name}
+                        {item.size ? ` · ${item.size}` : ""}
+                        {sale ? <span className="ml-1 text-[10px] font-black uppercase text-brand">{sale.percentOff}% OFF</span> : null}
+                      </span>
+                      <strong>{formatPrice(item.product.price * item.quantity)}</strong>
+                    </div>
+                  );
+                })}
               </div>
               <div className="mt-5 grid gap-3 border-t border-neutral-200 pt-5">
                 <div className="flex items-center justify-between">

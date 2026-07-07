@@ -23,14 +23,28 @@ export function validateProductInput(input: ProductWriteInput) {
     return "Informe uma quantidade em estoque igual ou maior que zero.";
   }
 
+  if (
+    "compare_at_price" in input &&
+    input.compare_at_price !== null &&
+    input.compare_at_price !== undefined &&
+    (!Number.isFinite(Number(input.compare_at_price)) || Number(input.compare_at_price) <= 0)
+  ) {
+    return "Informe um preço antigo maior que zero ou deixe o campo vazio.";
+  }
+
   return null;
 }
 
 function normalizeProductInput<T extends ProductWriteInput>(input: T) {
   const stockQuantity = "stock_quantity" in input ? Number(input.stock_quantity) : undefined;
+  const compareAtPrice =
+    "compare_at_price" in input && input.compare_at_price !== null && input.compare_at_price !== undefined
+      ? Math.round(Number(input.compare_at_price) * 100) / 100
+      : input.compare_at_price;
 
   return {
     ...input,
+    ...("compare_at_price" in input ? { compare_at_price: compareAtPrice ?? null } : {}),
     ...(stockQuantity !== undefined
       ? {
           stock_quantity: stockQuantity,

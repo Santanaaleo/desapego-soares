@@ -3,11 +3,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/formatters";
 import { calculateBestInstallment } from "@/lib/installments";
+import { getProductSale } from "@/lib/product-pricing";
 import type { Product } from "@/types/product";
 
 export function ProductCard({ product }: { product: Product }) {
   const bestInstallment = calculateBestInstallment(product.price);
   const unavailable = product.sold_out || product.stock_quantity <= 0;
+  const sale = getProductSale(product);
 
   return (
     <article className="group mx-auto flex h-full w-[94%] flex-col overflow-hidden rounded-md border border-neutral-200 bg-white transition hover:border-brand hover:shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
@@ -45,7 +47,17 @@ export function ProductCard({ product }: { product: Product }) {
         {product.sizes.length ? (
           <p className="min-h-3 text-xs font-medium text-neutral-600">Tamanhos: {product.sizes.join(", ")}</p>
         ) : null}
-        <p className="mt-auto text-lg font-extrabold text-neutral-950">{formatPrice(product.price)}</p>
+        <div className="mt-auto grid gap-0.5">
+          {sale ? (
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-neutral-400 line-through">{formatPrice(sale.compareAtPrice)}</span>
+              <span className="rounded-full bg-brand-mist px-2 py-0.5 text-[10px] font-black uppercase text-brand">
+                {sale.percentOff}% OFF
+              </span>
+            </div>
+          ) : null}
+          <p className="text-lg font-extrabold text-neutral-950">{formatPrice(product.price)}</p>
+        </div>
         <p className="text-[11px] font-semibold leading-4 text-neutral-500">
           ou {bestInstallment.label} de {bestInstallment.formattedInstallmentAmount}
         </p>

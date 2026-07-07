@@ -10,6 +10,8 @@ export const mockProducts: Product[] = [
     description:
       "Polo original Lacoste Sport em verde vibrante com microestampa, gola estruturada e acabamento premium.",
     price: 189.9,
+    compare_at_price: null,
+    sale_active: false,
     category: "Polos",
     brand: "Lacoste Sport",
     sizes: ["M", "G"],
@@ -34,6 +36,8 @@ export const mockProducts: Product[] = [
     description:
       "Polo original Lacoste Sport azul com etiqueta, estampa discreta e visual esportivo para uso casual.",
     price: 209.9,
+    compare_at_price: null,
+    sale_active: false,
     category: "Polos",
     brand: "Lacoste Sport",
     sizes: ["P", "M"],
@@ -58,6 +62,8 @@ export const mockProducts: Product[] = [
     description:
       "Modelo verde original com fotos de detalhe para conferir tecido, gola, logo aplicado e caimento.",
     price: 179.9,
+    compare_at_price: null,
+    sale_active: false,
     category: "Polos",
     brand: "Lacoste Sport",
     sizes: ["M"],

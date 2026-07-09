@@ -1,5 +1,6 @@
 import { supabase } from "./client";
 import { supabaseAdmin } from "./server";
+import { sortProductsWithSoldOutLast } from "@/lib/products";
 import type { Product, ProductInput } from "@/types/product";
 
 const table = "products";
@@ -87,7 +88,7 @@ export async function listActiveProducts() {
     .eq("active", true)
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return data as Product[];
+  return sortProductsWithSoldOutLast(data as Product[]);
 }
 
 export async function getActiveProductBySlug(slug: string) {

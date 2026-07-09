@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useProducts } from "@/hooks/useProducts";
 import { categories } from "@/lib/constants";
+import { filterAvailableProducts } from "@/lib/products";
 import { ProductCard } from "./ProductCard";
 
 export function CategoryProductSections() {
   const { products } = useProducts();
-  const activeProducts = products.filter((product) => product.active);
+  const activeProducts = filterAvailableProducts(products.filter((product) => product.active));
 
   return (
     <div className="grid gap-8">

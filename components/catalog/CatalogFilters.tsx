@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { categories } from "@/lib/constants";
 import { ProductGrid } from "@/components/product/ProductGrid";
+import { sortProductsWithSoldOutLast } from "@/lib/products";
 import type { Product } from "@/types/product";
 
 export function CatalogFilters({
@@ -30,12 +31,12 @@ export function CatalogFilters({
   const filtered = useMemo(() => {
     const normalizedQuery = normalize(query);
 
-    return products.filter((product) => {
+    return sortProductsWithSoldOutLast(products.filter((product) => {
       const text = normalize(`${product.name} ${product.brand} ${product.category} ${product.description}`);
       const matchesQuery = !normalizedQuery || text.includes(normalizedQuery);
       const matchesCategory = category === "Todos" || product.category === category;
       return matchesQuery && matchesCategory;
-    });
+    }));
   }, [category, products, query]);
 
   function updateQuery(value: string) {

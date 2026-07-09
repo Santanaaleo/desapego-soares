@@ -1,4 +1,5 @@
 import type { Product } from "@/types/product";
+import { sortProductsWithSoldOutLast } from "@/lib/products";
 
 const now = new Date().toISOString();
 
@@ -84,7 +85,7 @@ export const mockProducts: Product[] = [
 ];
 
 export function getProducts() {
-  return mockProducts.filter((product) => product.active);
+  return sortProductsWithSoldOutLast(mockProducts.filter((product) => product.active));
 }
 
 export function getFeaturedProducts() {

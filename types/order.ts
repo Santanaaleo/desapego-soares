@@ -46,6 +46,7 @@ export type Order = {
   customer_name: string;
   customer_email: string;
   customer_phone: string | null;
+  customer_document: string | null;
   zip_code: string;
   address: string;
   address_number: string;
@@ -65,3 +66,8 @@ export type Order = {
 export type OrderWithItems = Order & {
   order_items: OrderItem[];
 };
+
+export type OrderListItem = Pick<
+  Order,
+  "id" | "order_number" | "status" | "customer_name" | "customer_phone" | "city" | "state" | "total" | "coupon_code" | "created_at"
+>;

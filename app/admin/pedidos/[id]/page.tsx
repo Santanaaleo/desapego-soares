@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { CopyTrackingCodeButton } from "@/components/admin/CopyTrackingCodeButton";
 import { formatPrice } from "@/lib/formatters";
+import { formatCustomerDocument } from "@/lib/customer-document";
 import { requireAdmin } from "@/lib/admin-server";
 import { getOrderForAdmin } from "@/lib/supabase/orders";
 import { formatOrderNumber, orderStatusBadgeClasses, orderStatusLabels, type OrderStatus } from "@/types/order";
@@ -25,6 +26,11 @@ function formatDate(value: string) {
     dateStyle: "short",
     timeStyle: "short"
   }).format(new Date(value));
+}
+
+function formatCep(value: string) {
+  const cep = value.replace(/\D/g, "");
+  return cep.length === 8 ? cep.replace(/(\d{5})(\d{3})/, "$1-$2") : value;
 }
 
 export default async function AdminPedidoDetalhePage({ params }: { params: Promise<{ id: string }> }) {
@@ -84,6 +90,9 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
                 <p>
                   <strong>Telefone:</strong> {order.customer_phone || "-"}
                 </p>
+                <p>
+                  <strong>CPF/CNPJ:</strong> {order.customer_document ? formatCustomerDocument(order.customer_document) : "Não informado"}
+                </p>
               </div>
             </div>
 
@@ -91,13 +100,23 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
               <h2 className="font-display text-xl font-black uppercase text-neutral-950">Endereço</h2>
               <div className="mt-4 grid gap-2 text-sm text-neutral-700">
                 <p>
-                  {order.address}, {order.address_number}
-                  {order.complement ? ` - ${order.complement}` : ""}
+                  <strong>Logradouro:</strong> {order.address}
                 </p>
                 <p>
-                  {order.neighborhood} - {order.city}/{order.state}
+                  <strong>Número:</strong> {order.address_number}
                 </p>
-                <p>CEP: {order.zip_code}</p>
+                <p>
+                  <strong>Complemento:</strong> {order.complement || "Não informado"}
+                </p>
+                <p>
+                  <strong>Bairro:</strong> {order.neighborhood}
+                </p>
+                <p>
+                  <strong>Cidade/UF:</strong> {order.city}/{order.state}
+                </p>
+                <p>
+                  <strong>CEP:</strong> {formatCep(order.zip_code)}
+                </p>
               </div>
             </div>
 

@@ -180,7 +180,8 @@ export default function EntregaPage() {
             firstName: form.firstName,
             lastName: form.lastName,
             phone: form.phone,
-            email: form.email
+            email: form.email,
+            document: form.document
           },
           address: {
             cep: form.cep,
@@ -264,7 +265,15 @@ export default function EntregaPage() {
 
               <div className="rounded-md border border-neutral-200 bg-white p-5">
                 <h2 className="font-display text-xl font-black uppercase text-neutral-950">Nota fiscal</h2>
-                <Input required className="mt-4" value={form.document} onChange={(event) => updateField("document", event.target.value)} placeholder="CPF ou CNPJ" />
+                <Input
+                  required
+                  className="mt-4"
+                  inputMode="numeric"
+                  maxLength={18}
+                  value={form.document}
+                  onChange={(event) => updateField("document", event.target.value)}
+                  placeholder="CPF ou CNPJ"
+                />
               </div>
 
               <div className="rounded-md border border-neutral-200 bg-neutral-50 p-5">

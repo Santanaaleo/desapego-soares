@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { validateActiveCoupon } from "@/lib/supabase/coupons";
 import { calculateShippingWithSuperFrete, cleanCep } from "@/lib/superfrete";
+import { isValidCustomerDocument, normalizeCustomerDocument } from "@/lib/customer-document";
 
 type CheckoutItemInput = {
   productId?: string;
@@ -17,6 +18,7 @@ type CheckoutRequest = {
     lastName?: string;
     phone?: string;
     email?: string;
+    document?: string;
   };
   address?: {
     cep?: string;
@@ -97,6 +99,9 @@ export async function POST(request: Request) {
   if (!items.length) return badRequest("Sacola vazia.");
   if (!customer || !clean(customer.firstName) || !clean(customer.lastName) || !clean(customer.phone) || !clean(customer.email)) {
     return badRequest("Dados do cliente incompletos.");
+  }
+  if (!isValidCustomerDocument(customer.document)) {
+    return badRequest("CPF/CNPJ inválido.");
   }
   if (
     !address ||
@@ -235,6 +240,7 @@ export async function POST(request: Request) {
       customer_name: `${clean(customer.firstName)} ${clean(customer.lastName)}`,
       customer_email: clean(customer.email),
       customer_phone: clean(customer.phone),
+      customer_document: normalizeCustomerDocument(customer.document),
       zip_code: clean(address.cep).replace(/\D/g, ""),
       address: clean(address.street),
       address_number: clean(address.number),

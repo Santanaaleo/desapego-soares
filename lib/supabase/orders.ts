@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "./server";
-import type { Order, OrderStatus, OrderWithItems } from "@/types/order";
+import type { Order, OrderListItem, OrderStatus, OrderWithItems } from "@/types/order";
 
 const ordersTable = "orders";
 const allowedStatuses: OrderStatus[] = ["pending", "paid", "shipped", "delivered", "cancelled"];
@@ -11,9 +11,12 @@ export function isOrderStatus(value: unknown): value is OrderStatus {
 export async function listOrdersForAdmin() {
   if (!supabaseAdmin) return null;
 
-  const { data, error } = await supabaseAdmin.from(ordersTable).select("*").order("created_at", { ascending: false });
+  const { data, error } = await supabaseAdmin
+    .from(ordersTable)
+    .select("id,order_number,status,customer_name,customer_phone,city,state,total,coupon_code,created_at")
+    .order("created_at", { ascending: false });
   if (error) throw error;
-  return data as Order[];
+  return data as OrderListItem[];
 }
 
 export async function getOrderForAdmin(id: string) {

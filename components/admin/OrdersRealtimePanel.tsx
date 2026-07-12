@@ -1,15 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/formatters";
-import { supabase } from "@/lib/supabase/client";
-import { formatOrderNumber, orderStatusBadgeClasses, orderStatusLabels, type Order, type OrderStatus } from "@/types/order";
+import { formatOrderNumber, orderStatusBadgeClasses, orderStatusLabels, type OrderListItem, type OrderStatus } from "@/types/order";
 
 type Props = {
-  initialOrders: Order[];
+  initialOrders: OrderListItem[];
   selectedStatus: "all" | OrderStatus;
 };
 
@@ -37,7 +36,7 @@ function isSameDay(date: Date, comparison: Date) {
   );
 }
 
-function getStats(orders: Order[]) {
+function getStats(orders: OrderListItem[]) {
   const today = new Date();
   const todayOrders = orders.filter((order) => isSameDay(new Date(order.created_at), today));
   const billableTodayOrders = todayOrders.filter((order) => ["paid", "shipped", "delivered"].includes(order.status));
@@ -50,44 +49,12 @@ function getStats(orders: Order[]) {
   };
 }
 
-function sortOrders(orders: Order[]) {
+function sortOrders(orders: OrderListItem[]) {
   return [...orders].sort((first, second) => new Date(second.created_at).getTime() - new Date(first.created_at).getTime());
 }
 
 export function OrdersRealtimePanel({ initialOrders, selectedStatus }: Props) {
-  const [orders, setOrders] = useState(() => sortOrders(initialOrders));
-
-  useEffect(() => {
-    if (!supabase) return;
-    const client = supabase;
-
-    const channel = client
-      .channel("admin-orders-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "orders" },
-        (payload) => {
-          setOrders((current) => {
-            if (payload.eventType === "DELETE") {
-              return current.filter((order) => order.id !== (payload.old as Pick<Order, "id">).id);
-            }
-
-            const nextOrder = payload.new as Order;
-            const exists = current.some((order) => order.id === nextOrder.id);
-            const nextOrders = exists
-              ? current.map((order) => (order.id === nextOrder.id ? nextOrder : order))
-              : [nextOrder, ...current];
-
-            return sortOrders(nextOrders);
-          });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      client.removeChannel(channel);
-    };
-  }, []);
+  const orders = useMemo(() => sortOrders(initialOrders), [initialOrders]);
 
   const filteredOrders = useMemo(
     () => (selectedStatus === "all" ? orders : orders.filter((order) => order.status === selectedStatus)),

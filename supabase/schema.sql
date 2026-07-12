@@ -145,13 +145,33 @@ create index if not exists coupons_usage_limit_idx on coupons (usage_limit);
 
 alter table orders
   add column if not exists coupon_code text,
-  add column if not exists discount_amount numeric(10,2) not null default 0;
+  add column if not exists discount_amount numeric(10,2) not null default 0,
+  add column if not exists customer_document text;
 
 alter table orders
   add constraint orders_discount_amount_check check (discount_amount >= 0);
 
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'orders_customer_document_check'
+      and conrelid = 'orders'::regclass
+  ) then
+    alter table orders
+      add constraint orders_customer_document_check check (
+        customer_document is null
+        or customer_document ~ '^([0-9]{11}|[0-9]{14})$'
+      );
+  end if;
+end
+$$;
+
 alter table products enable row level security;
 alter table coupons enable row level security;
+alter table orders enable row level security;
+alter table order_items enable row level security;
 
 drop policy if exists "Public can read active products" on products;
 create policy "Public can read active products"

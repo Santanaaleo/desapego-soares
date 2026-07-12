@@ -8,8 +8,8 @@ import type { CartItem as CartItemType } from "@/types/cart";
 
 type Props = {
   item: CartItemType;
-  onRemove: (id: string, size: string) => void;
-  onQuantity: (id: string, size: string, quantity: number) => void;
+  onRemove: (id: string, size: string, variation: string) => void;
+  onQuantity: (id: string, size: string, variation: string, quantity: number) => void;
 };
 
 export function CartItem({ item, onRemove, onQuantity }: Props) {
@@ -27,6 +27,7 @@ export function CartItem({ item, onRemove, onQuantity }: Props) {
         <p className="font-display text-base font-black uppercase text-neutral-950">{item.product.name}</p>
         <p className="text-xs font-bold uppercase text-neutral-500">{item.product.brand}</p>
         {item.size ? <p className="text-sm font-bold text-neutral-700">Tamanho: {item.size}</p> : null}
+        {item.variation ? <p className="text-sm font-bold text-neutral-700">Variação: {item.variation}</p> : null}
         <div className="grid gap-0.5">
           {sale ? (
             <div className="flex items-center gap-2">
@@ -47,7 +48,7 @@ export function CartItem({ item, onRemove, onQuantity }: Props) {
           <button
             type="button"
             className="focus-ring flex h-10 w-10 items-center justify-center disabled:cursor-not-allowed disabled:text-neutral-300"
-            onClick={() => onQuantity(item.product.id, item.size, item.quantity - 1)}
+            onClick={() => onQuantity(item.product.id, item.size, item.variation, item.quantity - 1)}
             aria-label="Diminuir quantidade"
           >
             <Minus size={16} />
@@ -56,7 +57,7 @@ export function CartItem({ item, onRemove, onQuantity }: Props) {
           <button
             type="button"
             className="focus-ring flex h-10 w-10 items-center justify-center"
-            onClick={() => onQuantity(item.product.id, item.size, item.quantity + 1)}
+            onClick={() => onQuantity(item.product.id, item.size, item.variation, item.quantity + 1)}
             disabled={reachedStockLimit}
             aria-label="Aumentar quantidade"
           >
@@ -66,7 +67,7 @@ export function CartItem({ item, onRemove, onQuantity }: Props) {
         <button
           type="button"
           className="focus-ring flex h-10 w-10 items-center justify-center rounded-md text-red-600 hover:bg-red-50"
-          onClick={() => onRemove(item.product.id, item.size)}
+          onClick={() => onRemove(item.product.id, item.size, item.variation)}
           aria-label="Remover produto"
         >
           <Trash2 size={18} />

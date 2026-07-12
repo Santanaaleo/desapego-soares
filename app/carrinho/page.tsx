@@ -25,7 +25,7 @@ export default function CarrinhoPage() {
             <div className="grid content-start gap-4">
               {items.map((item) => (
                 <CartItem
-                  key={`${item.product.id}-${item.size}`}
+                  key={`${item.product.id}-${item.size}-${item.variation}`}
                   item={item}
                   onRemove={remove}
                   onQuantity={updateQuantity}

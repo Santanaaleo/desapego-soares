@@ -11,6 +11,7 @@ export function buildWhatsAppMessage(items: CartItem[], checkout?: CheckoutData,
     return [
       `${item.quantity}x ${item.product.name}`,
       item.size ? `Tamanho: ${item.size}` : null,
+      item.variation ? `Variação: ${item.variation}` : null,
       `Valor: ${formatPrice(itemTotal)}`
     ]
       .filter(Boolean)

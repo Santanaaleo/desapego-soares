@@ -23,6 +23,12 @@ alter table products
   add column if not exists stock_quantity integer not null default 1;
 
 alter table products
+  add column if not exists variations text[] not null default '{}'::text[];
+
+alter table order_items
+  add column if not exists variation text;
+
+alter table products
   add constraint products_stock_quantity_check check (stock_quantity >= 0);
 
 create index if not exists products_stock_quantity_idx on products (stock_quantity);

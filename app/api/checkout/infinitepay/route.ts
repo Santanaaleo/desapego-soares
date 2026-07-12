@@ -6,6 +6,7 @@ import { calculateShippingWithSuperFrete, cleanCep } from "@/lib/superfrete";
 type CheckoutItemInput = {
   productId?: string;
   size?: string;
+  variation?: string;
   quantity?: number;
 };
 
@@ -40,6 +41,7 @@ type ProductRow = {
   active: boolean;
   sold_out: boolean;
   stock_quantity: number;
+  variations: string[] | null;
 };
 
 const infinitePayUrl = "https://api.checkout.infinitepay.io/links";
@@ -114,6 +116,7 @@ export async function POST(request: Request) {
   const normalizedItems = items.map((item) => ({
     productId: clean(item.productId),
     size: clean(item.size),
+    variation: clean(item.variation),
     quantity: Number(item.quantity)
   }));
 
@@ -124,7 +127,7 @@ export async function POST(request: Request) {
   const productIds = Array.from(new Set(normalizedItems.map((item) => item.productId)));
   const { data: products, error: productsError } = await supabaseAdmin
     .from("products")
-    .select("id,name,price,active,sold_out,stock_quantity")
+    .select("id,name,price,active,sold_out,stock_quantity,variations")
     .in("id", productIds)
     .eq("active", true);
 
@@ -148,6 +151,15 @@ export async function POST(request: Request) {
     return badRequest("Quantidade máxima disponível em estoque.");
   }
 
+  if (
+    normalizedItems.some((item) => {
+      const variations = (productMap.get(item.productId)?.variations ?? []).map((variation) => variation.trim()).filter(Boolean);
+      return variations.length ? !item.variation || !variations.includes(item.variation) : Boolean(item.variation);
+    })
+  ) {
+    return badRequest("Selecione uma opção válida para cada produto.");
+  }
+
   const orderItems = normalizedItems.map((item) => {
     const product = productMap.get(item.productId)!;
     const unitPrice = Number(product.price);
@@ -158,6 +170,7 @@ export async function POST(request: Request) {
       product_name: product.name,
       quantity: item.quantity,
       size: item.size || null,
+      variation: item.variation || null,
       unit_price: money(unitPrice),
       subtotal
     };

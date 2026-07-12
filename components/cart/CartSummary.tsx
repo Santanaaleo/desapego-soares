@@ -27,10 +27,11 @@ export function CartSummary({ items, total }: { items: CartItem[]; total: number
           const sale = getProductSale(item.product);
 
           return (
-            <div key={`${item.product.id}-${item.size}`} className="flex justify-between gap-3">
+            <div key={`${item.product.id}-${item.size}-${item.variation}`} className="flex justify-between gap-3">
               <span>
                 {item.quantity}x {item.product.name}
                 {item.size ? ` · ${item.size}` : ""}
+                {item.variation ? ` · ${item.variation}` : ""}
                 {sale ? <span className="ml-1 text-[10px] font-black uppercase text-brand">{sale.percentOff}% OFF</span> : null}
               </span>
               <strong>{formatPrice(item.product.price * item.quantity)}</strong>

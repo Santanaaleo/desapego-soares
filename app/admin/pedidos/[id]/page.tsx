@@ -107,11 +107,12 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
                 {order.order_items.map((item) => (
                   <div
                     key={item.id}
-                    className="grid gap-2 border-b border-neutral-100 p-3 text-sm last:border-b-0 sm:grid-cols-[1fr_auto_auto_auto] sm:items-center"
+                    className="grid gap-2 border-b border-neutral-100 p-3 text-sm last:border-b-0 sm:grid-cols-[1fr_auto_auto_auto_auto] sm:items-center"
                   >
                     <p className="font-bold text-neutral-950">{item.product_name}</p>
                     <p className="text-neutral-600">Qtd: {item.quantity}</p>
                     <p className="text-neutral-600">Tamanho: {item.size || "-"}</p>
+                    <p className="text-neutral-600">Variação: {item.variation || "-"}</p>
                     <p className="font-black text-neutral-950">{formatPrice(item.subtotal)}</p>
                   </div>
                 ))}

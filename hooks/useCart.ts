@@ -17,7 +17,12 @@ function readCart() {
       .filter((item) => item.product && typeof item.size === "string")
       .map((item) => {
         const stockQuantity = Number.isInteger(item.product.stock_quantity) ? item.product.stock_quantity : item.quantity;
-        return { ...item, product: { ...item.product, stock_quantity: stockQuantity }, quantity: Math.min(item.quantity, stockQuantity) };
+        return {
+          ...item,
+          variation: typeof item.variation === "string" ? item.variation : "",
+          product: { ...item.product, stock_quantity: stockQuantity },
+          quantity: Math.min(item.quantity, stockQuantity)
+        };
       })
       .filter((item) => item.quantity > 0 && item.product.stock_quantity > 0);
   } catch {
@@ -56,16 +61,18 @@ export function useCart() {
     window.localStorage.setItem(cartStorageKey, JSON.stringify(items));
   }, [items, ready]);
 
-  function add(product: Product, size: string) {
-    setItems((current) => addProductToCart(current, product, size));
+  function add(product: Product, size: string, variation: string) {
+    setItems((current) => addProductToCart(current, product, size, variation));
   }
 
-  function remove(productId: string, size: string) {
-    setItems((current) => current.filter((item) => !(item.product.id === productId && item.size === size)));
+  function remove(productId: string, size: string, variation: string) {
+    setItems((current) =>
+      current.filter((item) => !(item.product.id === productId && item.size === size && item.variation === variation))
+    );
   }
 
-  function updateQuantity(productId: string, size: string, quantity: number) {
-    setItems((current) => updateCartQuantity(current, productId, size, quantity));
+  function updateQuantity(productId: string, size: string, variation: string, quantity: number) {
+    setItems((current) => updateCartQuantity(current, productId, size, variation, quantity));
   }
 
   function clear() {

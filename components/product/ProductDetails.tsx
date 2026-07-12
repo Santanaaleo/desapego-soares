@@ -14,8 +14,10 @@ import type { Product } from "@/types/product";
 export function ProductDetails({ product }: { product: Product }) {
   const [added, setAdded] = useState(false);
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedVariation, setSelectedVariation] = useState("");
   const [error, setError] = useState("");
   const availableSizes = product.sizes.filter(Boolean);
+  const availableVariations = Array.from(new Set((product.variations ?? []).map((variation) => variation.trim()).filter(Boolean)));
   const bestInstallment = calculateBestInstallment(product.price);
   const unavailable = product.sold_out || product.stock_quantity <= 0;
   const sale = getProductSale(product);
@@ -33,11 +35,23 @@ export function ProductDetails({ product }: { product: Product }) {
       return;
     }
 
+    if (availableVariations.length && !selectedVariation) {
+      setError("Selecione uma opção.");
+      setAdded(false);
+      return;
+    }
+
     const stored = window.localStorage.getItem(cartStorageKey);
     const items = stored ? (JSON.parse(stored) as CartItem[]) : [];
-    const currentQuantity = items.find((item) => item.product.id === product.id && item.size === selectedSize)?.quantity ?? 0;
-    const nextItems = addProductToCart(items, product, selectedSize);
-    const nextQuantity = nextItems.find((item) => item.product.id === product.id && item.size === selectedSize)?.quantity ?? 0;
+    const currentQuantity =
+      items.find(
+        (item) => item.product.id === product.id && item.size === selectedSize && (item.variation ?? "") === selectedVariation
+      )?.quantity ?? 0;
+    const nextItems = addProductToCart(items, product, selectedSize, selectedVariation);
+    const nextQuantity =
+      nextItems.find(
+        (item) => item.product.id === product.id && item.size === selectedSize && (item.variation ?? "") === selectedVariation
+      )?.quantity ?? 0;
 
     if (nextQuantity <= currentQuantity) {
       setError("Quantidade máxima disponível em estoque.");
@@ -121,9 +135,41 @@ export function ProductDetails({ product }: { product: Product }) {
               </button>
             ))}
           </div>
-          {error ? <p className="mt-3 text-sm font-bold text-red-600">{error}</p> : null}
         </div>
       ) : null}
+
+      {availableVariations.length ? (
+        <fieldset>
+          <legend className="mb-3 text-sm font-semibold uppercase text-neutral-950">Escolha a opção</legend>
+          <div className="grid gap-2">
+            {availableVariations.map((variation) => (
+              <label
+                key={variation}
+                className={`focus-within:ring-2 focus-within:ring-brand/30 flex min-h-11 cursor-pointer items-center gap-3 rounded-md border px-4 text-sm font-semibold transition ${
+                  selectedVariation === variation
+                    ? "border-brand bg-brand-mist text-brand"
+                    : "border-neutral-300 bg-white text-neutral-950 hover:border-brand"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="product-variation"
+                  value={variation}
+                  checked={selectedVariation === variation}
+                  onChange={() => {
+                    setSelectedVariation(variation);
+                    setError("");
+                  }}
+                  className="accent-brand"
+                />
+                {variation}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
+
+      {error ? <p className="text-sm font-bold text-red-600">{error}</p> : null}
 
       <Button onClick={addToCart} className="gap-2 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600" disabled={unavailable}>
         <ShoppingBag size={18} />

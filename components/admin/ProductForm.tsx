@@ -22,6 +22,7 @@ export function ProductForm({ product, onSubmit }: Props) {
   const [category, setCategory] = useState<ProductInput["category"]>(product?.category || "Polos");
   const [brand, setBrand] = useState(product?.brand || "");
   const [sizesText, setSizesText] = useState(product?.sizes.join(", ") || "");
+  const [variationsText, setVariationsText] = useState(product?.variations?.join(", ") || "");
   const [condition, setCondition] = useState(product?.condition || "");
   const [featured, setFeatured] = useState(product?.featured || false);
   const [active, setActive] = useState(product?.active ?? true);
@@ -57,6 +58,10 @@ export function ProductForm({ product, onSubmit }: Props) {
     const sizes = sizesText
       .split(",")
       .map((size) => size.trim())
+      .filter(Boolean);
+    const variations = variationsText
+      .split(",")
+      .map((variation) => variation.trim())
       .filter(Boolean);
     const numericPrice = parsePrice(price);
     const numericCompareAtPrice = compareAtPrice.trim() ? parsePrice(compareAtPrice) : null;
@@ -99,6 +104,7 @@ export function ProductForm({ product, onSubmit }: Props) {
       category,
       brand,
       sizes,
+      variations,
       condition,
       featured,
       active,
@@ -191,6 +197,16 @@ export function ProductForm({ product, onSubmit }: Props) {
         <p className="text-xs font-bold text-neutral-500">
           Separe por vírgula. Deixe vazio para produtos sem tamanho, como óculos.
         </p>
+      </div>
+
+      <div className="grid gap-3 rounded-md border border-neutral-200 bg-neutral-50 p-4">
+        <p className="text-sm font-black uppercase text-neutral-950">Variações (Opcional)</p>
+        <Input
+          value={variationsText}
+          onChange={(event) => setVariationsText(event.target.value)}
+          placeholder="Ex: Preto/Azul, Preto/Branco, Preto/Vermelho"
+        />
+        <p className="text-xs font-bold text-neutral-500">Separe as variações por vírgula. Deixe vazio se o produto não possuir opções.</p>
       </div>
 
       <textarea

@@ -27,6 +27,7 @@ export type OrderItem = {
   product_name: string;
   quantity: number;
   size: string | null;
+  variation: string | null;
   unit_price: number;
   subtotal: number;
   created_at: string;

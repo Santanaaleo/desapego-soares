@@ -12,7 +12,7 @@ export function ProductCard({ product }: { product: Product }) {
   const sale = getProductSale(product);
 
   return (
-    <article className="group mx-auto flex h-full w-[94%] flex-col overflow-hidden rounded-md border border-neutral-200 bg-white transition hover:border-brand hover:shadow-[0_14px_32px_rgba(15,23,42,0.06)]">
+    <article className="group mx-auto flex h-full w-full flex-col overflow-hidden rounded-md border border-neutral-200 bg-white transition hover:border-brand hover:shadow-[0_14px_32px_rgba(15,23,42,0.06)] sm:w-[94%]">
       <Link href={`/produto/${product.slug}`} className="relative block overflow-hidden bg-neutral-100">
         {unavailable ? (
           <span className="absolute left-3 top-3 z-10 rounded-full bg-neutral-950 px-3 py-1 text-xs font-semibold uppercase text-white">

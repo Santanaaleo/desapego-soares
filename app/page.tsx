@@ -43,7 +43,7 @@ const categoryCovers: Record<ProductCategory, string> = {
   Óculos: "/produtos/categorias/oculos-transparente.png",
   Moletons: "/produtos/categorias/moletons-categoria.png",
   Perfumes: "/produtos/categorias/perfumes-categoria.png",
-  Calças: "/Produtos/calca.png"
+  Calças: "/produtos/calca.png"
 };
 
 const categoryImageFit: Record<ProductCategory, string> = {
@@ -120,19 +120,19 @@ export default function Home() {
 
       <section className="border-b border-neutral-200 py-3 sm:py-4">
         <Container>
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="text-base font-bold uppercase text-neutral-950 sm:text-lg">Destaques</h2>
-            <Link href="/catalogo" className="text-xs font-semibold uppercase text-brand hover:text-neutral-950">
+          <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
+            <h2 className="min-w-0 text-base font-bold uppercase text-neutral-950 sm:text-lg">Destaques</h2>
+            <Link href="/catalogo" className="flex-shrink-0 whitespace-nowrap text-xs font-semibold uppercase text-brand hover:text-neutral-950">
               Ver tudo
             </Link>
           </div>
-          <div className="scrollbar-none flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 sm:grid sm:grid-cols-4 sm:overflow-visible sm:pb-0 lg:grid-cols-9">
+          <div className="scrollbar-none flex max-w-full min-w-0 snap-x snap-mandatory gap-2 overflow-x-auto overflow-y-hidden pb-2 sm:grid sm:grid-cols-4 sm:overflow-visible sm:pb-0 lg:grid-cols-9">
             {homeCategoryOrder.map((category) => {
               return (
                 <Link
                   key={category}
                   href={{ pathname: "/catalogo", query: { categoria: category } }}
-                  className="group w-[72vw] max-w-[260px] flex-none snap-start overflow-hidden rounded-md border border-neutral-200 bg-white text-center shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-neutral-950 hover:shadow-[0_16px_36px_rgba(15,23,42,0.08)] sm:w-auto sm:max-w-none"
+                  className="group w-[84%] max-w-[340px] flex-none snap-start overflow-hidden rounded-md border border-neutral-200 bg-white text-center shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-neutral-950 hover:shadow-[0_16px_36px_rgba(15,23,42,0.08)] sm:w-auto sm:max-w-none"
                 >
                   <span className="relative block h-24 overflow-hidden bg-neutral-100 sm:h-32">
                     {category === "Calças" ? (
@@ -140,8 +140,7 @@ export default function Home() {
                         src={categoryCovers[category]}
                         alt={category}
                         fill
-                        unoptimized
-                        sizes="72vw"
+                        sizes="(min-width: 1024px) 11vw, (min-width: 640px) 25vw, 84vw"
                         className={`transition duration-300 ${categoryImageFit[category]}`}
                       />
                     ) : (
@@ -149,7 +148,7 @@ export default function Home() {
                         src={categoryCovers[category]}
                         alt={category}
                         fill
-                        sizes="(min-width: 1024px) 11vw, (min-width: 640px) 25vw, 72vw"
+                        sizes="(min-width: 1024px) 11vw, (min-width: 640px) 25vw, 84vw"
                         className={`transition duration-300 ${categoryImageFit[category]}`}
                       />
                     )}
@@ -167,14 +166,19 @@ export default function Home() {
 
       <section className="py-5 sm:py-7">
         <Container>
-          <div className="mb-4 flex items-end justify-between gap-4 sm:mb-5">
-            <div>
+          <div className="mb-4 grid min-w-0 gap-1.5 sm:mb-5 sm:flex sm:items-end sm:justify-between sm:gap-4">
+            <div className="min-w-0">
               <p className="text-xs font-semibold uppercase text-brand">Disponíveis agora</p>
-              <h2 className="mt-1 text-xl font-bold uppercase text-neutral-950 sm:text-2xl">
-                Produtos por categoria
-              </h2>
+              <div className="mt-1 flex min-w-0 items-start justify-between gap-3 sm:block">
+                <h2 className="min-w-0 text-[19px] font-bold uppercase leading-tight text-neutral-950 min-[375px]:text-xl sm:text-2xl">
+                  Produtos por categoria
+                </h2>
+                <Button href="/catalogo" variant="ghost" className="h-auto flex-shrink-0 whitespace-nowrap px-0 py-1 text-xs sm:hidden">
+                  Ver todos
+                </Button>
+              </div>
             </div>
-            <Button href="/catalogo" variant="ghost">
+            <Button href="/catalogo" variant="ghost" className="hidden flex-shrink-0 whitespace-nowrap sm:inline-flex">
               Ver todos
             </Button>
           </div>

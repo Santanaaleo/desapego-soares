@@ -260,7 +260,7 @@ export function ImageUpload({ images, onChange }: Props) {
     <div className="grid gap-3">
       <label className="focus-within:outline-brand grid cursor-pointer gap-3 rounded-md border border-dashed border-neutral-300 p-5 text-center">
         <Upload className="mx-auto text-brand" size={24} />
-        <span className="text-sm font-bold text-neutral-800">
+        <span className="text-sm font-semibold text-neutral-800">
           {uploading ? "Enviando imagem..." : images.length ? "Trocar ou adicionar imagem" : "Enviar imagens do produto"}
         </span>
         <span className="text-xs text-neutral-500">As imagens serão salvas no Supabase Storage.</span>
@@ -274,7 +274,7 @@ export function ImageUpload({ images, onChange }: Props) {
           onChange={(event) => handleFiles(event.target.files)}
         />
       </label>
-      {error ? <p className="text-sm font-bold text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm font-normal text-red-600">{error}</p> : null}
 
       {images.length ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

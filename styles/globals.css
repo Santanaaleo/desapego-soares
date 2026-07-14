@@ -34,6 +34,11 @@ textarea {
   font: inherit;
 }
 
+strong,
+b {
+  font-weight: 600;
+}
+
 ::selection {
   background: #0f3d2e;
   color: #ffffff;

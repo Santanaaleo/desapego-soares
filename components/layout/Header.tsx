@@ -102,7 +102,7 @@ export function Header() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Buscar produto, marca ou categoria"
-            className="focus-ring h-9 w-full rounded-md border border-neutral-300 bg-neutral-50 pl-9 pr-3 text-xs font-medium text-neutral-700 transition placeholder:text-neutral-500 hover:border-brand hover:bg-white sm:h-11 sm:pl-11 sm:pr-4 sm:text-sm"
+            className="focus-ring h-9 w-full rounded-md border border-neutral-300 bg-neutral-50 pl-9 pr-3 text-xs font-normal text-neutral-700 transition placeholder:font-normal placeholder:text-neutral-500 hover:border-brand hover:bg-white sm:h-11 sm:pl-11 sm:pr-4 sm:text-sm"
           />
         </form>
 
@@ -133,7 +133,7 @@ export function Header() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Buscar produto, marca ou categoria"
-                className="focus-ring h-10 w-full rounded-md border border-neutral-300 bg-neutral-50 pl-10 pr-3 text-sm font-medium text-neutral-700"
+                className="focus-ring h-10 w-full rounded-md border border-neutral-300 bg-neutral-50 pl-10 pr-3 text-sm font-normal text-neutral-700 placeholder:font-normal"
               />
             </form>
             {links.map((link) => (

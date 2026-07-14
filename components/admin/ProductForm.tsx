@@ -128,7 +128,7 @@ export function ProductForm({ product, onSubmit }: Props) {
         <select
           value={category}
           onChange={(event) => setCategory(event.target.value as ProductInput["category"])}
-          className="focus-ring h-11 rounded-md border border-neutral-200 bg-white px-4 text-sm"
+          className="focus-ring h-11 rounded-md border border-neutral-200 bg-white px-4 text-sm font-normal"
         >
           {categories.map((item) => (
             <option key={item}>{item}</option>
@@ -148,15 +148,15 @@ export function ProductForm({ product, onSubmit }: Props) {
       </div>
 
       <div className="grid gap-3 rounded-md border border-neutral-200 bg-neutral-50 p-4">
-        <p className="text-sm font-black uppercase text-neutral-950">Promoção opcional</p>
-        <label className="flex items-center gap-2 text-sm font-bold text-neutral-950">
+        <p className="text-sm font-semibold uppercase text-neutral-950">Promoção opcional</p>
+        <label className="flex items-center gap-2 text-sm font-semibold text-neutral-950">
           <input type="checkbox" checked={saleActive} onChange={(event) => setSaleActive(event.target.checked)} />
           Este produto está em promoção
         </label>
         {saleActive ? (
           <div className="grid gap-3">
             <div className="grid gap-2">
-              <label className="text-xs font-black uppercase text-neutral-700" htmlFor="compare-at-price">
+              <label className="text-xs font-semibold uppercase text-neutral-700" htmlFor="compare-at-price">
                 Preço antigo
               </label>
               <Input
@@ -166,21 +166,21 @@ export function ProductForm({ product, onSubmit }: Props) {
                 placeholder="Digite o valor original antes da promoção"
                 inputMode="decimal"
               />
-              <p className="text-xs font-bold leading-5 text-neutral-500">
+              <p className="text-xs font-normal leading-5 text-neutral-500">
                 Se o produto custa R$ 199,90 e antes custava R$ 299,90, coloque 299,90 aqui.
               </p>
             </div>
             {hasInvalidSalePrice ? (
-              <p className="rounded-md border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-700">
+              <p className="rounded-md border border-red-200 bg-red-50 p-3 text-xs font-normal text-red-700">
                 O preço antigo precisa ser maior que o preço atual.
               </p>
             ) : null}
             {previewPercentOff ? (
               <div className="rounded-md border border-neutral-200 bg-white p-3 text-sm">
-                <p className="mb-2 text-xs font-black uppercase text-neutral-500">Como aparecerá na loja:</p>
+                <p className="mb-2 text-xs font-semibold uppercase text-neutral-500">Como aparecerá na loja:</p>
                 <p className="text-neutral-500">De: {formatPrice(previewCompareAtPrice!)}</p>
-                <p className="font-black text-neutral-950">Por: {formatPrice(previewPrice)}</p>
-                <p className="font-black text-brand">{previewPercentOff}% OFF</p>
+                <p className="font-bold text-neutral-950">Por: {formatPrice(previewPrice)}</p>
+                <p className="font-semibold text-brand">{previewPercentOff}% OFF</p>
               </div>
             ) : null}
           </div>
@@ -188,49 +188,49 @@ export function ProductForm({ product, onSubmit }: Props) {
       </div>
 
       <div className="grid gap-3">
-        <p className="text-sm font-black uppercase text-neutral-950">Tamanhos disponíveis</p>
+        <p className="text-sm font-semibold uppercase text-neutral-950">Tamanhos disponíveis</p>
         <Input
           value={sizesText}
           onChange={(event) => setSizesText(event.target.value)}
           placeholder="Ex: P, M, G, GG ou 38, 39, 40, 41"
         />
-        <p className="text-xs font-bold text-neutral-500">
+        <p className="text-xs font-normal text-neutral-500">
           Separe por vírgula. Deixe vazio para produtos sem tamanho, como óculos.
         </p>
       </div>
 
       <div className="grid gap-3 rounded-md border border-neutral-200 bg-neutral-50 p-4">
-        <p className="text-sm font-black uppercase text-neutral-950">Variações (Opcional)</p>
+        <p className="text-sm font-semibold uppercase text-neutral-950">Variações (Opcional)</p>
         <Input
           value={variationsText}
           onChange={(event) => setVariationsText(event.target.value)}
           placeholder="Ex: Preto/Azul, Preto/Branco, Preto/Vermelho"
         />
-        <p className="text-xs font-bold text-neutral-500">Separe as variações por vírgula. Deixe vazio se o produto não possuir opções.</p>
+        <p className="text-xs font-normal text-neutral-500">Separe as variações por vírgula. Deixe vazio se o produto não possuir opções.</p>
       </div>
 
       <textarea
         value={description}
         onChange={(event) => setDescription(event.target.value)}
         placeholder="Descrição"
-        className="focus-ring min-h-28 rounded-md border border-neutral-200 p-4 text-sm"
+        className="focus-ring min-h-28 rounded-md border border-neutral-200 p-4 text-sm font-normal placeholder:font-normal"
       />
       <div className="flex flex-wrap gap-4">
-        <label className="flex items-center gap-2 text-sm font-bold">
+        <label className="flex items-center gap-2 text-sm font-semibold">
           <input type="checkbox" checked={featured} onChange={(event) => setFeatured(event.target.checked)} />
           Destaque
         </label>
-        <label className="flex items-center gap-2 text-sm font-bold">
+        <label className="flex items-center gap-2 text-sm font-semibold">
           <input type="checkbox" checked={active} onChange={(event) => setActive(event.target.checked)} />
           Ativo
         </label>
-        <label className="flex items-center gap-2 text-sm font-bold">
+        <label className="flex items-center gap-2 text-sm font-semibold">
           <input type="checkbox" checked={soldOut || Number(stockQuantity) === 0} onChange={(event) => setSoldOut(event.target.checked)} />
           Produto esgotado
         </label>
       </div>
       <ImageUpload images={images} onChange={setImages} />
-      {error ? <p className="text-sm font-bold text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm font-normal text-red-600">{error}</p> : null}
       <Button type="submit">{product ? "Salvar alterações" : "Cadastrar produto"}</Button>
     </form>
   );

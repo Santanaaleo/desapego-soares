@@ -16,7 +16,7 @@ export function LogoutButton() {
     <button
       type="button"
       onClick={logout}
-      className="focus-ring inline-flex h-11 items-center justify-center gap-2 rounded-md border-2 border-neutral-950 px-4 text-sm font-black uppercase transition hover:border-brand hover:text-brand"
+      className="focus-ring inline-flex h-11 items-center justify-center gap-2 rounded-md border-2 border-neutral-950 px-4 text-sm font-semibold uppercase transition hover:border-brand hover:text-brand"
     >
       <LogOut size={18} />
       Sair

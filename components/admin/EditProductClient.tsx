@@ -17,7 +17,7 @@ export function EditProductClient({ id }: { id: string }) {
     return (
       <section className="py-10 sm:py-14">
         <Container className="max-w-4xl">
-          <p className="font-bold text-neutral-600">Carregando produto...</p>
+          <p className="font-normal text-neutral-600">Carregando produto...</p>
         </Container>
       </section>
     );
@@ -39,8 +39,8 @@ export function EditProductClient({ id }: { id: string }) {
   return (
     <section className="py-10 sm:py-14">
       <Container className="max-w-4xl">
-        <h1 className="mb-8 font-display text-4xl font-black text-neutral-950">Editar produto</h1>
-        {error ? <p className="mb-4 text-sm font-bold text-red-600">{error}</p> : null}
+        <h1 className="mb-8 text-4xl font-bold text-neutral-950">Editar produto</h1>
+        {error ? <p className="mb-4 text-sm font-normal text-red-600">{error}</p> : null}
         <ProductForm product={product} onSubmit={handleSubmit} />
       </Container>
     </section>

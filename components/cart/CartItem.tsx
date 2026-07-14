@@ -24,15 +24,15 @@ export function CartItem({ item, onRemove, onQuantity }: Props) {
         <Image src={item.product.images[0]} alt={item.product.name} fill sizes="120px" className="object-contain object-center p-2" />
       </div>
       <div className="grid content-center gap-1">
-        <p className="font-display text-base font-black uppercase text-neutral-950">{item.product.name}</p>
-        <p className="text-xs font-bold uppercase text-neutral-500">{item.product.brand}</p>
-        {item.size ? <p className="text-sm font-bold text-neutral-700">Tamanho: {item.size}</p> : null}
-        {item.variation ? <p className="text-sm font-bold text-neutral-700">Variação: {item.variation}</p> : null}
+        <p className="text-base font-bold uppercase text-neutral-950">{item.product.name}</p>
+        <p className="text-xs font-semibold uppercase text-neutral-500">{item.product.brand}</p>
+        {item.size ? <p className="text-sm font-normal text-neutral-700">Tamanho: {item.size}</p> : null}
+        {item.variation ? <p className="text-sm font-normal text-neutral-700">Variação: {item.variation}</p> : null}
         <div className="grid gap-0.5">
           {sale ? (
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-neutral-400 line-through">{formatPrice(sale.compareAtPrice)}</span>
-              <span className="rounded-full bg-brand-mist px-2 py-0.5 text-[10px] font-black uppercase text-brand">
+              <span className="rounded-full bg-brand-mist px-2 py-0.5 text-[10px] font-semibold uppercase text-brand">
                 {sale.percentOff}% OFF
               </span>
             </div>
@@ -41,7 +41,7 @@ export function CartItem({ item, onRemove, onQuantity }: Props) {
             {formatPrice(item.product.price)} · Subtotal {formatPrice(subtotal)}
           </p>
         </div>
-        {reachedStockLimit ? <p className="text-xs font-bold text-red-600">Quantidade máxima disponível em estoque.</p> : null}
+        {reachedStockLimit ? <p className="text-xs font-normal text-red-600">Quantidade máxima disponível em estoque.</p> : null}
       </div>
       <div className="col-span-2 flex items-center justify-between gap-3 sm:col-span-1 sm:flex-col sm:items-end">
         <div className="flex h-10 items-center rounded-md border border-neutral-300 bg-white">
@@ -53,7 +53,7 @@ export function CartItem({ item, onRemove, onQuantity }: Props) {
           >
             <Minus size={16} />
           </button>
-          <span className="w-8 text-center text-sm font-black">{item.quantity}</span>
+          <span className="w-8 text-center text-sm font-semibold">{item.quantity}</span>
           <button
             type="button"
             className="focus-ring flex h-10 w-10 items-center justify-center"

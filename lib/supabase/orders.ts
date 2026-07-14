@@ -8,13 +8,17 @@ export function isOrderStatus(value: unknown): value is OrderStatus {
   return typeof value === "string" && allowedStatuses.includes(value as OrderStatus);
 }
 
-export async function listOrdersForAdmin() {
+export async function listOrdersForAdmin(archived = false) {
   if (!supabaseAdmin) return null;
 
-  const { data, error } = await supabaseAdmin
+  let query = supabaseAdmin
     .from(ordersTable)
-    .select("id,order_number,status,customer_name,customer_phone,city,state,total,coupon_code,created_at")
+    .select("id,order_number,status,customer_name,customer_phone,city,state,total,coupon_code,archived_at,created_at")
     .order("created_at", { ascending: false });
+
+  query = archived ? query.not("archived_at", "is", null) : query.is("archived_at", null);
+
+  const { data, error } = await query;
   if (error) throw error;
   return data as OrderListItem[];
 }
@@ -79,20 +83,21 @@ export async function updateOrderTrackingCode(id: string, trackingCode: string |
   return data as Order;
 }
 
-export type DeleteOrderResult = "deleted" | "not_found" | "blocked_status" | "blocked_payment";
+export type DeleteOrderResult = "deleted" | "not_found" | "blocked_status" | "blocked_payment" | "blocked_archived";
 
 export async function deleteOrderForAdmin(id: string) {
   if (!supabaseAdmin) return null;
 
   const { data: order, error: orderError } = await supabaseAdmin
     .from(ordersTable)
-    .select("status,order_nsu,transaction_nsu,invoice_slug,receipt_url")
+    .select("status,order_nsu,transaction_nsu,invoice_slug,receipt_url,capture_method,archived_at")
     .eq("id", id)
     .maybeSingle();
   if (orderError) throw orderError;
   if (!order) return "not_found";
+  if (order.archived_at) return "blocked_archived";
   if (order.status !== "pending") return "blocked_status";
-  if (order.order_nsu || order.transaction_nsu || order.invoice_slug || order.receipt_url) return "blocked_payment";
+  if (order.order_nsu || order.transaction_nsu || order.invoice_slug || order.receipt_url || order.capture_method) return "blocked_payment";
 
   const { data, error } = await supabaseAdmin.rpc("delete_order_for_admin", {
     input_order_id: id
@@ -100,6 +105,20 @@ export async function deleteOrderForAdmin(id: string) {
   if (error) throw error;
 
   return ((data as { result: DeleteOrderResult }[] | null) ?? [])[0]?.result ?? "not_found";
+}
+
+export type ArchiveOrderResult = "archived" | "restored" | "already_archived" | "already_active" | "not_found";
+
+export async function setOrderArchivedForAdmin(id: string, archived: boolean) {
+  if (!supabaseAdmin) return null;
+
+  const { data, error } = await supabaseAdmin.rpc("set_order_archived_for_admin", {
+    input_order_id: id,
+    input_archived: archived
+  });
+  if (error) throw error;
+
+  return ((data as { result: ArchiveOrderResult }[] | null) ?? [])[0]?.result ?? "not_found";
 }
 
 export async function markOrderPaidByOrderNsu(input: {

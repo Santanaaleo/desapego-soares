@@ -59,6 +59,7 @@ export type Order = {
   coupon_code: string | null;
   discount_amount: number;
   total: number;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -69,5 +70,15 @@ export type OrderWithItems = Order & {
 
 export type OrderListItem = Pick<
   Order,
-  "id" | "order_number" | "status" | "customer_name" | "customer_phone" | "city" | "state" | "total" | "coupon_code" | "created_at"
+  | "id"
+  | "order_number"
+  | "status"
+  | "customer_name"
+  | "customer_phone"
+  | "city"
+  | "state"
+  | "total"
+  | "coupon_code"
+  | "archived_at"
+  | "created_at"
 >;

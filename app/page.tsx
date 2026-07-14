@@ -90,10 +90,10 @@ export default function Home() {
         <Container className="grid gap-0 py-0 md:h-[430px] md:grid-cols-2">
           <div className="-mx-4 grid content-center bg-black px-4 py-5 text-white sm:-mx-6 sm:px-6 sm:py-7 md:mx-0 md:px-0 md:pr-10 md:py-10 lg:py-12">
             <p className="text-[11px] font-semibold uppercase text-white/80 sm:text-xs">Desapego Soares</p>
-            <h1 className="mt-2 max-w-2xl font-display text-[28px] font-semibold uppercase leading-[0.98] tracking-[0.04em] sm:text-[34px] md:text-[46px] md:leading-[1.02] lg:text-[52px]">
+            <h1 className="mt-2 max-w-2xl text-[28px] font-bold uppercase leading-[0.98] tracking-[0.04em] sm:text-[34px] md:text-[46px] md:leading-[1.02] lg:text-[52px]">
               Produtos originais para quem vive o corre
             </h1>
-            <p className="mt-2.5 max-w-xl text-[13px] font-medium leading-5 text-white/85 sm:mt-3 sm:text-base sm:leading-6">
+            <p className="mt-2.5 max-w-xl text-[13px] font-normal leading-5 text-white/85 sm:mt-3 sm:text-base sm:leading-6">
               Confira as peças disponíveis e finalize com Pix ou cartão pelo checkout seguro.
             </p>
             <div className="mt-3.5 flex flex-col gap-3 sm:mt-5 sm:flex-row">
@@ -121,7 +121,7 @@ export default function Home() {
       <section className="border-b border-neutral-200 py-3 sm:py-4">
         <Container>
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="font-display text-base font-semibold uppercase text-neutral-950 sm:text-lg">Destaques</h2>
+            <h2 className="text-base font-bold uppercase text-neutral-950 sm:text-lg">Destaques</h2>
             <Link href="/catalogo" className="text-xs font-semibold uppercase text-brand hover:text-neutral-950">
               Ver tudo
             </Link>
@@ -155,7 +155,7 @@ export default function Home() {
                     )}
                     <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent" />
                   </span>
-                  <span className="block px-3 py-3 text-sm font-medium tracking-normal text-neutral-950 sm:text-base">
+                  <span className="block px-3 py-3 text-sm font-semibold tracking-normal text-neutral-950 sm:text-base">
                     {category}
                   </span>
                 </Link>
@@ -170,7 +170,7 @@ export default function Home() {
           <div className="mb-4 flex items-end justify-between gap-4 sm:mb-5">
             <div>
               <p className="text-xs font-semibold uppercase text-brand">Disponíveis agora</p>
-              <h2 className="mt-1 font-display text-xl font-semibold uppercase text-neutral-950 sm:text-2xl">
+              <h2 className="mt-1 text-xl font-bold uppercase text-neutral-950 sm:text-2xl">
                 Produtos por categoria
               </h2>
             </div>
@@ -191,8 +191,8 @@ export default function Home() {
                   <div className="mb-5 flex justify-center text-brand">
                     <Icon size={34} strokeWidth={1.7} aria-hidden="true" />
                   </div>
-                  <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-neutral-950">{title}</h2>
-                  <p className="mt-2 text-sm font-medium leading-6 text-neutral-500">{description}</p>
+                  <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-neutral-950">{title}</h2>
+                  <p className="mt-2 text-sm font-normal leading-6 text-neutral-500">{description}</p>
                 </div>
               );
             })}

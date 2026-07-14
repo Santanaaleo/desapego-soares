@@ -143,8 +143,8 @@ export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
       <Container>
         <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <p className="text-sm font-black uppercase text-brand">Admin</p>
-            <h1 className="mt-2 font-display text-4xl font-black text-neutral-950 sm:text-5xl">Cupons</h1>
+            <p className="text-sm font-semibold uppercase text-brand">Admin</p>
+            <h1 className="mt-2 text-4xl font-bold text-neutral-950 sm:text-5xl">Cupons</h1>
           </div>
           <div className="flex flex-wrap gap-3">
             <Button href="/admin" variant="secondary">Produtos</Button>
@@ -155,9 +155,9 @@ export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
 
         <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
           <form onSubmit={submitCoupon} className="h-fit rounded-md border border-neutral-100 bg-white p-5 shadow-sm">
-            <h2 className="font-display text-xl font-black uppercase text-neutral-950">{editing ? "Editar cupom" : "Novo cupom"}</h2>
+            <h2 className="text-xl font-bold uppercase text-neutral-950">{editing ? "Editar cupom" : "Novo cupom"}</h2>
             <div className="mt-4 grid gap-3">
-              <label className="text-xs font-black uppercase text-neutral-500" htmlFor="coupon-code">Código do cupom</label>
+              <label className="text-xs font-semibold uppercase text-neutral-500" htmlFor="coupon-code">Código do cupom</label>
               <Input
                 id="coupon-code"
                 required
@@ -165,7 +165,7 @@ export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
                 onChange={(event) => setForm((current) => ({ ...current, code: normalizeCouponCode(event.target.value) }))}
                 placeholder="DESAPEGO10"
               />
-              <label className="text-xs font-black uppercase text-neutral-500" htmlFor="coupon-discount">Porcentagem de desconto</label>
+              <label className="text-xs font-semibold uppercase text-neutral-500" htmlFor="coupon-discount">Porcentagem de desconto</label>
               <Input
                 id="coupon-discount"
                 required
@@ -177,7 +177,7 @@ export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
                 onChange={(event) => setForm((current) => ({ ...current, discountPercent: event.target.value }))}
                 placeholder="10"
               />
-              <label className="text-xs font-black uppercase text-neutral-500" htmlFor="coupon-usage-limit">Limite de usos</label>
+              <label className="text-xs font-semibold uppercase text-neutral-500" htmlFor="coupon-usage-limit">Limite de usos</label>
               <Input
                 id="coupon-usage-limit"
                 min="1"
@@ -187,7 +187,7 @@ export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
                 onChange={(event) => setForm((current) => ({ ...current, usageLimit: event.target.value }))}
                 placeholder="Vazio = ilimitado"
               />
-              <label className="flex items-center gap-3 text-sm font-bold text-neutral-700">
+              <label className="flex items-center gap-3 text-sm font-semibold text-neutral-700">
                 <input
                   type="checkbox"
                   checked={form.active}
@@ -196,7 +196,7 @@ export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
                 Ativo
               </label>
             </div>
-            {message ? <p className="mt-4 text-sm font-semibold text-red-600">{message}</p> : null}
+            {message ? <p className="mt-4 text-sm font-normal text-red-600">{message}</p> : null}
             <div className="mt-5 flex flex-wrap gap-3">
               <Button type="submit" disabled={loading}>{loading ? "Salvando..." : editing ? "Salvar" : "Criar cupom"}</Button>
               {editing ? <Button type="button" variant="secondary" onClick={resetForm}>Cancelar</Button> : null}
@@ -205,18 +205,18 @@ export function CouponsAdmin({ initialCoupons }: { initialCoupons: Coupon[] }) {
 
           <div className="overflow-hidden rounded-md border border-neutral-100 bg-white shadow-sm">
             {!coupons.length ? (
-              <div className="p-10 text-center font-bold text-neutral-600">Nenhum cupom cadastrado.</div>
+              <div className="p-10 text-center font-normal text-neutral-600">Nenhum cupom cadastrado.</div>
             ) : (
               coupons.map((coupon) => (
                 <div key={coupon.id} className="grid gap-3 border-b border-neutral-100 p-4 last:border-b-0 lg:grid-cols-[1fr_auto_auto_auto] lg:items-center">
                   <div>
-                    <p className="font-black text-neutral-950">{coupon.code}</p>
-                    <p className="text-sm font-semibold text-neutral-500">Desconto: {coupon.discount_percent}%</p>
-                    <p className="text-sm font-semibold text-neutral-500">
+                    <p className="font-bold text-neutral-950">{coupon.code}</p>
+                    <p className="text-sm font-normal text-neutral-500">Desconto: {coupon.discount_percent}%</p>
+                    <p className="text-sm font-normal text-neutral-500">
                       Usos atuais: {coupon.usage_count} / {coupon.usage_limit ?? "ilimitado"}
                     </p>
                   </div>
-                  <span className={`w-fit rounded-full px-3 py-1 text-xs font-black uppercase ${coupon.active ? "bg-emerald-100 text-emerald-800" : "bg-neutral-200 text-neutral-600"}`}>
+                  <span className={`w-fit rounded-full px-3 py-1 text-xs font-semibold uppercase ${coupon.active ? "bg-emerald-100 text-emerald-800" : "bg-neutral-200 text-neutral-600"}`}>
                     {coupon.active ? "Ativo" : "Inativo"}
                   </span>
                   <div className="flex flex-wrap gap-2">

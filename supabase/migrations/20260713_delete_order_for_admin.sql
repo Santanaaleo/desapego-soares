@@ -26,7 +26,8 @@ begin
   if nullif(btrim(order_row.order_nsu), '') is not null
     or nullif(btrim(order_row.transaction_nsu), '') is not null
     or nullif(btrim(order_row.invoice_slug), '') is not null
-    or nullif(btrim(order_row.receipt_url), '') is not null then
+    or nullif(btrim(order_row.receipt_url), '') is not null
+    or nullif(btrim(order_row.capture_method), '') is not null then
     return query select 'blocked_payment'::text;
     return;
   end if;

@@ -15,8 +15,8 @@ export function AdminDashboard() {
       <Container>
         <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <p className="text-sm font-black uppercase text-brand">Admin</p>
-            <h1 className="mt-2 font-display text-4xl font-black text-neutral-950 sm:text-5xl">Produtos</h1>
+            <p className="text-sm font-semibold uppercase text-brand">Admin</p>
+            <h1 className="mt-2 text-4xl font-bold text-neutral-950 sm:text-5xl">Produtos</h1>
           </div>
           <div className="flex flex-wrap gap-3">
             <Button href="/admin/pedidos" variant="secondary">

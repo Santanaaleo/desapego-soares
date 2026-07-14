@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-server";
-import { deleteOrderForAdmin } from "@/lib/supabase/orders";
+import { deleteOrderForAdmin, setOrderArchivedForAdmin } from "@/lib/supabase/orders";
 
 type Params = {
   params: Promise<{ id: string }>;
@@ -42,6 +42,10 @@ export async function DELETE(_request: Request, { params }: Params) {
       );
     }
 
+    if (result === "blocked_archived") {
+      return NextResponse.json({ message: "Restaure o pedido antes de excluí-lo permanentemente." }, { status: 409 });
+    }
+
     revalidatePath("/admin/pedidos");
     revalidatePath(`/admin/pedidos/${id}`);
     return NextResponse.json({ ok: true });
@@ -50,5 +54,44 @@ export async function DELETE(_request: Request, { params }: Params) {
       { message: "Não foi possível excluir o pedido. Verifique as relações do banco e tente novamente." },
       { status: 500 }
     );
+  }
+}
+
+export async function PATCH(request: Request, { params }: Params) {
+  const { id } = await params;
+  await requireAdmin(`/admin/pedidos/${id}`);
+
+  if (!uuidPattern.test(id)) {
+    return NextResponse.json({ message: "Identificador de pedido inválido." }, { status: 400 });
+  }
+
+  let body: { action?: unknown };
+
+  try {
+    body = (await request.json()) as { action?: unknown };
+  } catch {
+    return NextResponse.json({ message: "Corpo da solicitação inválido." }, { status: 400 });
+  }
+
+  try {
+    if (body.action !== "archive" && body.action !== "restore") {
+      return NextResponse.json({ message: "Ação inválida." }, { status: 400 });
+    }
+
+    const result = await setOrderArchivedForAdmin(id, body.action === "archive");
+
+    if (!result) {
+      return NextResponse.json({ message: "Supabase admin não configurado." }, { status: 503 });
+    }
+
+    if (result === "not_found") {
+      return NextResponse.json({ message: "Pedido não encontrado." }, { status: 404 });
+    }
+
+    revalidatePath("/admin/pedidos");
+    revalidatePath(`/admin/pedidos/${id}`);
+    return NextResponse.json({ ok: true, result });
+  } catch {
+    return NextResponse.json({ message: "Não foi possível atualizar o arquivamento do pedido." }, { status: 500 });
   }
 }

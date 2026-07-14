@@ -7,6 +7,8 @@ type Props = {
   searchParams?: Promise<{
     status?: string;
     excluido?: string;
+    view?: string;
+    resultado?: string;
   }>;
 };
 
@@ -17,7 +19,25 @@ export default async function AdminPedidosPage({ searchParams }: Props) {
 
   const params = await searchParams;
   const selectedStatus = statusValues.includes(params?.status as "all" | OrderStatus) ? (params?.status as "all" | OrderStatus) : "all";
-  const orders = await listOrdersForAdmin();
+  const selectedView = params?.view === "archived" ? "archived" : "active";
+  const activeOrders = (await listOrdersForAdmin(false)) ?? [];
+  const orders = selectedView === "archived" ? (await listOrdersForAdmin(true)) ?? [] : activeOrders;
+  const feedback =
+    params?.resultado === "arquivado"
+      ? "Pedido arquivado. Os indicadores foram atualizados."
+      : params?.resultado === "restaurado"
+        ? "Pedido restaurado. Os indicadores foram atualizados."
+        : params?.resultado === "excluido" || params?.excluido === "1"
+          ? "Pedido excluído permanentemente. Os indicadores foram atualizados."
+          : undefined;
 
-  return <OrdersRealtimePanel initialOrders={orders ?? []} selectedStatus={selectedStatus} deletionSucceeded={params?.excluido === "1"} />;
+  return (
+    <OrdersRealtimePanel
+      initialOrders={orders}
+      statsOrders={activeOrders}
+      selectedStatus={selectedStatus}
+      selectedView={selectedView}
+      feedback={feedback}
+    />
+  );
 }

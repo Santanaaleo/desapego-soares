@@ -41,7 +41,7 @@ export function Footer() {
           </div>
         </div>
         <p className="mt-8 border-t border-neutral-100 pt-5 text-center text-xs text-neutral-400">
-          Desenvolvido por <span className="font-medium text-neutral-500">Santana Web Studio</span>
+          Desenvolvido por <span className="font-normal text-neutral-500">Santana Web Studio</span>
         </p>
       </Container>
     </footer>

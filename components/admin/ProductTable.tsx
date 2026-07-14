@@ -44,7 +44,7 @@ export function ProductTable({ products, onDelete, onToggleActive, onToggleFeatu
             <p className="text-sm font-semibold text-neutral-500">
               Estoque: {product.stock_quantity === 0 ? "Esgotado" : product.stock_quantity}
             </p>
-            <div className="mt-2 flex flex-wrap gap-2 text-xs font-black uppercase">
+            <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold uppercase">
               <span className={product.active ? "text-brand" : "text-red-600"}>
                 {product.active ? "Ativo" : "Inativo"}
               </span>
@@ -55,14 +55,14 @@ export function ProductTable({ products, onDelete, onToggleActive, onToggleFeatu
           <div className="col-span-2 flex flex-wrap gap-2 lg:col-span-1 lg:items-center">
             <button
               type="button"
-              className="focus-ring rounded-md border border-neutral-200 px-3 py-2 text-xs font-black uppercase hover:border-brand hover:text-brand"
+              className="focus-ring rounded-md border border-neutral-200 px-3 py-2 text-xs font-semibold uppercase hover:border-brand hover:text-brand"
               onClick={() => onToggleActive(product.id)}
             >
               {product.active ? "Desativar" : "Ativar"}
             </button>
             <button
               type="button"
-              className="focus-ring flex items-center gap-1 rounded-md border border-neutral-200 px-3 py-2 text-xs font-black uppercase hover:border-brand hover:text-brand"
+              className="focus-ring flex items-center gap-1 rounded-md border border-neutral-200 px-3 py-2 text-xs font-semibold uppercase hover:border-brand hover:text-brand"
               onClick={() => onToggleFeatured(product.id)}
             >
               <Star size={14} />

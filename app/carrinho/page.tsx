@@ -14,8 +14,8 @@ export default function CarrinhoPage() {
     <section className="py-6 sm:py-8">
       <Container>
         <div className="mb-5">
-          <p className="text-xs font-black uppercase text-brand">Sacola</p>
-          <h1 className="mt-1 font-display text-3xl font-black uppercase leading-none text-neutral-950 sm:text-4xl">
+          <p className="text-xs font-semibold uppercase text-brand">Sacola</p>
+          <h1 className="mt-1 text-3xl font-bold uppercase leading-none text-neutral-950 sm:text-4xl">
             Produtos separados
           </h1>
         </div>
@@ -36,13 +36,13 @@ export default function CarrinhoPage() {
           </div>
         ) : (
           <div className="rounded-md border border-dashed border-neutral-300 p-10 text-center">
-            <p className="font-bold text-neutral-700">Sua sacola está vazia.</p>
+            <p className="font-normal text-neutral-700">Sua sacola está vazia.</p>
             <Button href="/catalogo" className="mt-5">
               Ver catálogo
             </Button>
           </div>
         )}
-        <Link href="/catalogo" className="mt-8 inline-block text-sm font-bold text-brand hover:text-brand-secondary">
+        <Link href="/catalogo" className="mt-8 inline-block text-sm font-semibold text-brand hover:text-brand-secondary">
           Continuar vendo produtos
         </Link>
       </Container>

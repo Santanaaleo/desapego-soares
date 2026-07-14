@@ -45,7 +45,7 @@ export function LoginForm() {
         type="password"
         required
       />
-      {error ? <p className="text-sm font-bold text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm font-normal text-red-600">{error}</p> : null}
       <Button type="submit" disabled={loading}>
         {loading ? "Entrando..." : "Entrar"}
       </Button>

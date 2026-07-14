@@ -218,15 +218,15 @@ export default function EntregaPage() {
     <section className="py-6 sm:py-8">
       <Container>
         <div className="mb-5">
-          <p className="text-xs font-black uppercase text-brand">Entrega</p>
-          <h1 className="mt-1 font-display text-3xl font-black uppercase leading-none text-neutral-950 sm:text-4xl">
+          <p className="text-xs font-semibold uppercase text-brand">Entrega</p>
+          <h1 className="mt-1 text-3xl font-bold uppercase leading-none text-neutral-950 sm:text-4xl">
             Dados para finalizar
           </h1>
         </div>
 
         {!items.length ? (
           <div className="rounded-md border border-dashed border-neutral-300 p-10 text-center">
-            <p className="font-bold text-neutral-700">Sua sacola está vazia.</p>
+            <p className="font-normal text-neutral-700">Sua sacola está vazia.</p>
             <Button href="/catalogo" className="mt-5">
               Ver catálogo
             </Button>
@@ -235,7 +235,7 @@ export default function EntregaPage() {
           <form onSubmit={payOnline} className="grid gap-6 lg:grid-cols-[1fr_360px]">
             <div className="grid gap-5">
               <div className="rounded-md border border-neutral-200 bg-white p-5">
-                <h2 className="font-display text-xl font-black uppercase text-neutral-950">Cliente</h2>
+                <h2 className="text-xl font-bold uppercase text-neutral-950">Cliente</h2>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <Input required value={form.firstName} onChange={(event) => updateField("firstName", event.target.value)} placeholder="Nome" />
                   <Input required value={form.lastName} onChange={(event) => updateField("lastName", event.target.value)} placeholder="Sobrenome" />
@@ -245,11 +245,11 @@ export default function EntregaPage() {
               </div>
 
               <div className="rounded-md border border-neutral-200 bg-white p-5">
-                <h2 className="font-display text-xl font-black uppercase text-neutral-950">Endereço</h2>
+                <h2 className="text-xl font-bold uppercase text-neutral-950">Endereço</h2>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <div>
                     <Input required value={form.cep} onChange={(event) => updateField("cep", event.target.value)} placeholder="CEP" />
-                    {cepStatus ? <p className="mt-2 text-xs font-bold text-neutral-500">{cepStatus}</p> : null}
+                    {cepStatus ? <p className="mt-2 text-xs font-normal text-neutral-500">{cepStatus}</p> : null}
                   </div>
                   <Button type="button" variant="secondary" onClick={fetchCep} disabled={loadingCep || loadingShipping}>
                     {loadingCep || loadingShipping ? "Consultando..." : "Buscar CEP e frete"}
@@ -264,7 +264,7 @@ export default function EntregaPage() {
               </div>
 
               <div className="rounded-md border border-neutral-200 bg-white p-5">
-                <h2 className="font-display text-xl font-black uppercase text-neutral-950">Nota fiscal</h2>
+                <h2 className="text-xl font-bold uppercase text-neutral-950">Nota fiscal</h2>
                 <Input
                   required
                   className="mt-4"
@@ -277,9 +277,9 @@ export default function EntregaPage() {
               </div>
 
               <div className="rounded-md border border-neutral-200 bg-neutral-50 p-5">
-                <h2 className="font-display text-xl font-black uppercase text-neutral-950">Frete</h2>
-                {loadingShipping ? <p className="mt-4 text-sm font-semibold text-neutral-600">Calculando opções...</p> : null}
-                {shippingError ? <p className="mt-4 text-sm font-semibold text-red-600">{shippingError}</p> : null}
+                <h2 className="text-xl font-bold uppercase text-neutral-950">Frete</h2>
+                {loadingShipping ? <p className="mt-4 text-sm font-normal text-neutral-600">Calculando opções...</p> : null}
+                {shippingError ? <p className="mt-4 text-sm font-normal text-red-600">{shippingError}</p> : null}
                 {!loadingShipping && !shipping && !shippingError ? (
                   <p className="mt-4 text-sm text-neutral-600">Informe o CEP e clique em “Buscar CEP e frete”.</p>
                 ) : null}
@@ -297,19 +297,19 @@ export default function EntregaPage() {
                             selected ? "border-brand ring-1 ring-brand" : "border-neutral-200 hover:border-brand"
                           }`}
                         >
-                          <p className="font-black uppercase text-neutral-950">{option.service}</p>
-                          <p className="mt-1 text-sm font-bold text-neutral-500">{formatShippingOption(option)}</p>
+                          <p className="font-semibold uppercase text-neutral-950">{option.service}</p>
+                          <p className="mt-1 text-sm font-normal text-neutral-500">{formatShippingOption(option)}</p>
                         </button>
                       );
                     })}
-                    <p className="text-xs font-bold text-neutral-500 sm:col-span-2">{shippingMessage}</p>
+                    <p className="text-xs font-normal text-neutral-500 sm:col-span-2">{shippingMessage}</p>
                   </div>
                 ) : null}
               </div>
             </div>
 
             <aside className="h-fit rounded-md border border-neutral-200 bg-neutral-50 p-5">
-              <h2 className="font-display text-xl font-black uppercase text-neutral-950">Resumo</h2>
+              <h2 className="text-xl font-bold uppercase text-neutral-950">Resumo</h2>
               <div className="mt-4 grid gap-2 text-sm text-neutral-700">
                 {items.map((item) => {
                   const sale = getProductSale(item.product);
@@ -320,7 +320,7 @@ export default function EntregaPage() {
                         {item.quantity}x {item.product.name}
                         {item.size ? ` · ${item.size}` : ""}
                         {item.variation ? ` · ${item.variation}` : ""}
-                        {sale ? <span className="ml-1 text-[10px] font-black uppercase text-brand">{sale.percentOff}% OFF</span> : null}
+                        {sale ? <span className="ml-1 text-[10px] font-semibold uppercase text-brand">{sale.percentOff}% OFF</span> : null}
                       </span>
                       <strong>{formatPrice(item.product.price * item.quantity)}</strong>
                     </div>
@@ -329,17 +329,17 @@ export default function EntregaPage() {
               </div>
               <div className="mt-5 grid gap-3 border-t border-neutral-200 pt-5">
                 <div className="flex items-center justify-between">
-                  <span className="font-black uppercase text-neutral-700">Subtotal</span>
+                  <span className="font-semibold uppercase text-neutral-700">Subtotal</span>
                   <span className="font-semibold text-neutral-950">{formatPrice(total)}</span>
                 </div>
                 {coupon ? (
                   <div className="flex items-center justify-between text-emerald-700">
-                    <span className="font-black uppercase">Cupom {coupon.code}</span>
+                    <span className="font-semibold uppercase">Cupom {coupon.code}</span>
                     <span className="font-semibold">-{formatPrice(discountAmount)}</span>
                   </div>
                 ) : null}
                 <div className="flex items-center justify-between">
-                  <span className="font-black uppercase text-neutral-700">
+                  <span className="font-semibold uppercase text-neutral-700">
                     {selectedShipping ? `Frete ${selectedShipping.service}` : "Frete"}
                   </span>
                   <span className="font-semibold text-neutral-950">
@@ -347,19 +347,19 @@ export default function EntregaPage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between border-t border-neutral-200 pt-3">
-                  <span className="font-black uppercase text-neutral-700">Total</span>
-                  <span className="font-display text-2xl font-black text-brand">{formatPrice(finalTotal)}</span>
+                  <span className="font-semibold uppercase text-neutral-700">Total</span>
+                  <span className="text-2xl font-bold text-brand">{formatPrice(finalTotal)}</span>
                 </div>
               </div>
               <div className="mt-5 rounded-md border border-neutral-200 bg-white p-3">
-                <label className="text-xs font-black uppercase text-neutral-500" htmlFor="checkout-coupon">
+                <label className="text-xs font-semibold uppercase text-neutral-500" htmlFor="checkout-coupon">
                   Cupom de desconto
                 </label>
                 {coupon ? (
-                  <div className="mt-3 rounded-md bg-emerald-50 p-3 text-sm font-bold text-emerald-800">
+                  <div className="mt-3 rounded-md bg-emerald-50 p-3 text-sm font-normal text-emerald-800">
                     <p>Cupom {coupon.code} aplicado</p>
                     <p>Desconto: -{formatPrice(discountAmount)}</p>
-                    <button type="button" onClick={removeCoupon} className="mt-2 text-xs font-black uppercase underline underline-offset-4">
+                    <button type="button" onClick={removeCoupon} className="mt-2 text-xs font-semibold uppercase underline underline-offset-4">
                       Remover cupom
                     </button>
                   </div>
@@ -371,17 +371,17 @@ export default function EntregaPage() {
                     </Button>
                   </div>
                 )}
-                {couponError ? <p className="mt-2 text-xs font-bold text-red-600">{couponError}</p> : null}
+                {couponError ? <p className="mt-2 text-xs font-normal text-red-600">{couponError}</p> : null}
               </div>
-              <p className="mt-4 text-xs font-bold leading-5 text-neutral-600">
+              <p className="mt-4 text-xs font-normal leading-5 text-neutral-600">
                 Parcelamento: {bestInstallment.label} de {bestInstallment.formattedInstallmentAmount} sobre o total com desconto.
               </p>
-              {submitError ? <p className="mt-4 text-sm font-semibold text-red-600">{submitError}</p> : null}
+              {submitError ? <p className="mt-4 text-sm font-normal text-red-600">{submitError}</p> : null}
               <Button type="submit" className="mt-6 w-full gap-2" disabled={loadingPayment}>
                 <CreditCard size={18} />
                 {loadingPayment ? "Gerando pagamento..." : "Finalizar com Pix ou Cartão"}
               </Button>
-              <Link href="/carrinho" className="mt-4 inline-block text-sm font-bold text-brand hover:text-brand-secondary">
+              <Link href="/carrinho" className="mt-4 inline-block text-sm font-semibold text-brand hover:text-brand-secondary">
                 Voltar para sacola
               </Link>
             </aside>

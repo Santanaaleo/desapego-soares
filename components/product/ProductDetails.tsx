@@ -70,33 +70,33 @@ export function ProductDetails({ product }: { product: Product }) {
       <div>
         <p className="text-xs font-semibold uppercase text-brand">{product.category}</p>
         {unavailable ? (
-          <span className="mt-3 inline-flex rounded-full bg-neutral-950 px-3 py-1 text-xs font-black uppercase text-white">
+          <span className="mt-3 inline-flex rounded-full bg-neutral-950 px-3 py-1 text-xs font-semibold uppercase text-white">
             Esgotado
           </span>
         ) : null}
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase leading-tight text-neutral-950 sm:text-4xl">
+        <h1 className="mt-2 text-3xl font-bold uppercase leading-tight text-neutral-950 sm:text-4xl">
           {product.name}
         </h1>
-        <p className="mt-2 text-sm font-medium uppercase text-neutral-500">{product.brand}</p>
+        <p className="mt-2 text-sm font-normal uppercase text-neutral-500">{product.brand}</p>
       </div>
 
       <div>
         {sale ? (
           <div className="mb-1 flex flex-wrap items-center gap-2">
             <span className="text-sm font-semibold text-neutral-400 line-through">{formatPrice(sale.compareAtPrice)}</span>
-            <span className="rounded-full bg-brand-mist px-2.5 py-1 text-xs font-black uppercase text-brand">
+            <span className="rounded-full bg-brand-mist px-2.5 py-1 text-xs font-semibold uppercase text-brand">
               {sale.percentOff}% OFF
             </span>
           </div>
         ) : null}
-        <p className="font-display text-3xl font-extrabold text-neutral-950">{formatPrice(product.price)}</p>
-        {sale ? <p className="mt-1 text-sm font-bold text-brand">Economize {formatPrice(sale.savings)}</p> : null}
-        <p className="mt-1 text-sm font-semibold text-neutral-600">
+        <p className="text-3xl font-bold text-neutral-950">{formatPrice(product.price)}</p>
+        {sale ? <p className="mt-1 text-sm font-semibold text-brand">Economize {formatPrice(sale.savings)}</p> : null}
+        <p className="mt-1 text-sm font-normal text-neutral-600">
           ou {bestInstallment.label} de {bestInstallment.formattedInstallmentAmount} no cartão
         </p>
       </div>
       {unavailable ? (
-        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm font-normal text-red-700">
           Produto esgotado no momento. Ele permanece visível apenas como parte do catálogo.
         </div>
       ) : null}
@@ -169,14 +169,14 @@ export function ProductDetails({ product }: { product: Product }) {
         </fieldset>
       ) : null}
 
-      {error ? <p className="text-sm font-bold text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm font-normal text-red-600">{error}</p> : null}
 
       <Button onClick={addToCart} className="gap-2 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600" disabled={unavailable}>
         <ShoppingBag size={18} />
         {unavailable ? "Esgotado" : added ? "Adicionar mais uma" : "Adicionar a sacola"}
       </Button>
       {added ? (
-        <div className="rounded-md border border-brand/30 bg-brand-mist p-3 text-sm font-bold text-brand">
+        <div className="rounded-md border border-brand/30 bg-brand-mist p-3 text-sm font-normal text-brand">
           Produto adicionado a sacola.{" "}
           <Link href="/carrinho" className="underline underline-offset-4 hover:text-neutral-950">
             Ver sacola

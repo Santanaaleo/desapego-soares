@@ -135,23 +135,15 @@ export default function Home() {
                   className="group w-[84%] max-w-[340px] flex-none snap-start overflow-hidden rounded-md border border-neutral-200 bg-white text-center shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-neutral-950 hover:shadow-[0_16px_36px_rgba(15,23,42,0.08)] sm:w-auto sm:max-w-none"
                 >
                   <span className="relative block h-24 overflow-hidden bg-neutral-100 sm:h-32">
-                    {category === "Calças" ? (
-                      <Image
-                        src={categoryCovers[category]}
-                        alt={category}
-                        fill
-                        sizes="(min-width: 1024px) 11vw, (min-width: 640px) 25vw, 84vw"
-                        className={`transition duration-300 ${categoryImageFit[category]}`}
-                      />
-                    ) : (
-                      <Image
-                        src={categoryCovers[category]}
-                        alt={category}
-                        fill
-                        sizes="(min-width: 1024px) 11vw, (min-width: 640px) 25vw, 84vw"
-                        className={`transition duration-300 ${categoryImageFit[category]}`}
-                      />
-                    )}
+                    {/* Category covers are public static files; native img avoids optimizer differences in mobile Safari. */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={categoryCovers[category]}
+                      alt={category}
+                      width="100%"
+                      height="100%"
+                      className={`block h-full w-full transition duration-300 ${categoryImageFit[category]}`}
+                    />
                     <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent" />
                   </span>
                   <span className="block px-3 py-3 text-sm font-semibold tracking-normal text-neutral-950 sm:text-base">

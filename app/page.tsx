@@ -132,7 +132,7 @@ export default function Home() {
                 <Link
                   key={category}
                   href={{ pathname: "/catalogo", query: { categoria: category } }}
-                  className="group w-[84%] max-w-[340px] flex-none snap-start overflow-hidden rounded-md border border-neutral-200 bg-white text-center shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-neutral-950 hover:shadow-[0_16px_36px_rgba(15,23,42,0.08)] sm:w-auto sm:max-w-none"
+                  className="group w-[76%] max-w-[340px] flex-none snap-start overflow-hidden rounded-md border border-neutral-200 bg-white text-center shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-neutral-950 hover:shadow-[0_16px_36px_rgba(15,23,42,0.08)] sm:w-auto sm:max-w-none"
                 >
                   <span className="relative block h-24 overflow-hidden bg-neutral-100 sm:h-32">
                     {/* Category covers are public static files; native img avoids optimizer differences in mobile Safari. */}

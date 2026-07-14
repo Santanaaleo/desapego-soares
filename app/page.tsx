@@ -35,15 +35,15 @@ function SecurePurchaseIcon({ size = 34, strokeWidth = 1.7 }: { size?: number; s
 }
 
 const categoryCovers: Record<ProductCategory, string> = {
-  Camisas: "/produtos/categorias/camisas.jpeg",
-  Polos: "/produtos/categorias/polos-categoria.png",
-  Shorts: "/produtos/categorias/shorts-categoria.png",
-  Bonés: "/produtos/categorias/bones-categoria.png",
-  Tênis: "/produtos/categorias/tenis-categoria.png",
-  Óculos: "/produtos/categorias/oculos-transparente.png",
-  Moletons: "/produtos/categorias/moletons-categoria.png",
-  Perfumes: "/produtos/categorias/perfumes-categoria.png",
-  Calças: "/produtos/calca.png"
+  Camisas: "/categories/camisas.jpg?v=2",
+  Polos: "/categories/polos.png?v=2",
+  Shorts: "/categories/shorts.png?v=2",
+  Bonés: "/categories/bones.png?v=2",
+  Tênis: "/categories/tenis.png?v=2",
+  Óculos: "/categories/oculos.png?v=2",
+  Moletons: "/categories/moletons.png?v=2",
+  Perfumes: "/categories/perfumes.png?v=2",
+  Calças: "/categories/calcas.png?v=2"
 };
 
 const categoryImageFit: Record<ProductCategory, string> = {
@@ -142,7 +142,8 @@ export default function Home() {
                       alt={category}
                       width="100%"
                       height="100%"
-                      className={`block h-full w-full transition duration-300 ${categoryImageFit[category]}`}
+                      style={{ width: "100%", height: "100%", display: "block", objectFit: "contain" }}
+                      className={`transition duration-300 ${categoryImageFit[category]}`}
                     />
                     <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent" />
                   </span>

@@ -4,6 +4,7 @@ import { Container } from "@/components/layout/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { CopyTrackingCodeButton } from "@/components/admin/CopyTrackingCodeButton";
+import { DeleteOrderSection } from "@/components/admin/DeleteOrderSection";
 import { formatPrice } from "@/lib/formatters";
 import { formatCustomerDocument } from "@/lib/customer-document";
 import { requireAdmin } from "@/lib/admin-server";
@@ -46,6 +47,8 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
 
   const updateStatus = updateOrderStatusAction.bind(null, order.id);
   const updateTrackingCode = updateOrderTrackingCodeAction.bind(null, order.id);
+  const canDelete =
+    order.status === "pending" && !order.order_nsu && !order.transaction_nsu && !order.invoice_slug && !order.receipt_url;
 
   return (
     <section className="py-10 sm:py-14">
@@ -204,6 +207,8 @@ export default async function AdminPedidoDetalhePage({ params }: { params: Promi
               ) : null}
               <Button type="submit">Salvar rastreio</Button>
             </form>
+
+            <DeleteOrderSection orderId={order.id} orderNumber={order.order_number} canDelete={canDelete} />
           </aside>
         </div>
 

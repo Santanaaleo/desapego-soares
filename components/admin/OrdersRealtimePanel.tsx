@@ -10,6 +10,7 @@ import { formatOrderNumber, orderStatusBadgeClasses, orderStatusLabels, type Ord
 type Props = {
   initialOrders: OrderListItem[];
   selectedStatus: "all" | OrderStatus;
+  deletionSucceeded?: boolean;
 };
 
 const statusFilters: { label: string; value: "all" | OrderStatus }[] = [
@@ -53,7 +54,7 @@ function sortOrders(orders: OrderListItem[]) {
   return [...orders].sort((first, second) => new Date(second.created_at).getTime() - new Date(first.created_at).getTime());
 }
 
-export function OrdersRealtimePanel({ initialOrders, selectedStatus }: Props) {
+export function OrdersRealtimePanel({ initialOrders, selectedStatus, deletionSucceeded = false }: Props) {
   const orders = useMemo(() => sortOrders(initialOrders), [initialOrders]);
 
   const filteredOrders = useMemo(
@@ -76,6 +77,12 @@ export function OrdersRealtimePanel({ initialOrders, selectedStatus }: Props) {
             </Button>
           </div>
         </div>
+
+        {deletionSucceeded ? (
+          <p role="status" className="mb-6 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
+            Pedido excluído permanentemente. Os indicadores foram atualizados.
+          </p>
+        ) : null}
 
         <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-md border border-neutral-100 bg-white p-4 shadow-sm">

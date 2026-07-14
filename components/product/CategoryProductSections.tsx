@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useProducts } from "@/hooks/useProducts";
-import { categories } from "@/lib/constants";
+import { homeProductSectionCategories } from "@/lib/constants";
 import { filterAvailableProducts } from "@/lib/products";
 import { ProductCard } from "./ProductCard";
 
@@ -12,7 +12,7 @@ export function CategoryProductSections() {
 
   return (
     <div className="grid gap-8">
-      {categories.map((category) => {
+      {homeProductSectionCategories.map((category) => {
         const categoryProducts = activeProducts
           .filter((product) => product.category === category)
           .slice(0, 8);

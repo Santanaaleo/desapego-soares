@@ -6,6 +6,7 @@ import type { OrderStatus } from "@/types/order";
 type Props = {
   searchParams?: Promise<{
     status?: string;
+    excluido?: string;
   }>;
 };
 
@@ -18,5 +19,5 @@ export default async function AdminPedidosPage({ searchParams }: Props) {
   const selectedStatus = statusValues.includes(params?.status as "all" | OrderStatus) ? (params?.status as "all" | OrderStatus) : "all";
   const orders = await listOrdersForAdmin();
 
-  return <OrdersRealtimePanel initialOrders={orders ?? []} selectedStatus={selectedStatus} />;
+  return <OrdersRealtimePanel initialOrders={orders ?? []} selectedStatus={selectedStatus} deletionSucceeded={params?.excluido === "1"} />;
 }

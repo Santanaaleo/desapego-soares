@@ -8,6 +8,9 @@ const nextConfig = {
         hostname: "*.supabase.co"
       }
     ]
+  },
+  async rewrites() {
+    return [{ source: "/Produtos/calca.png", destination: "/produtos/calca.png" }];
   }
 };
 

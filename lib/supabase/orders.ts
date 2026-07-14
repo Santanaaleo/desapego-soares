@@ -79,6 +79,29 @@ export async function updateOrderTrackingCode(id: string, trackingCode: string |
   return data as Order;
 }
 
+export type DeleteOrderResult = "deleted" | "not_found" | "blocked_status" | "blocked_payment";
+
+export async function deleteOrderForAdmin(id: string) {
+  if (!supabaseAdmin) return null;
+
+  const { data: order, error: orderError } = await supabaseAdmin
+    .from(ordersTable)
+    .select("status,order_nsu,transaction_nsu,invoice_slug,receipt_url")
+    .eq("id", id)
+    .maybeSingle();
+  if (orderError) throw orderError;
+  if (!order) return "not_found";
+  if (order.status !== "pending") return "blocked_status";
+  if (order.order_nsu || order.transaction_nsu || order.invoice_slug || order.receipt_url) return "blocked_payment";
+
+  const { data, error } = await supabaseAdmin.rpc("delete_order_for_admin", {
+    input_order_id: id
+  });
+  if (error) throw error;
+
+  return ((data as { result: DeleteOrderResult }[] | null) ?? [])[0]?.result ?? "not_found";
+}
+
 export async function markOrderPaidByOrderNsu(input: {
   orderNsu: string;
   transactionNsu?: string | null;

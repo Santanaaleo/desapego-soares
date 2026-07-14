@@ -2,12 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "Muro SP";
-  src: url("/fonts/muro-sp.otf") format("opentype");
-  font-display: swap;
-}
-
 :root {
   color: #111111;
   background: #ffffff;
@@ -61,4 +55,12 @@ textarea {
 
 .top-marquee {
   animation: top-marquee 18s linear infinite;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }

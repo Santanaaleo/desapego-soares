@@ -42,7 +42,8 @@ const categoryCovers: Record<ProductCategory, string> = {
   Tênis: "/produtos/categorias/tenis-categoria.png",
   Óculos: "/produtos/categorias/oculos-transparente.png",
   Moletons: "/produtos/categorias/moletons-categoria.png",
-  Perfumes: "/produtos/categorias/perfumes-categoria.png"
+  Perfumes: "/produtos/categorias/perfumes-categoria.png",
+  Calças: "/Produtos/calca.png"
 };
 
 const categoryImageFit: Record<ProductCategory, string> = {
@@ -53,10 +54,11 @@ const categoryImageFit: Record<ProductCategory, string> = {
   Tênis: "object-contain object-center scale-[1.02] group-hover:scale-[1.05]",
   Óculos: "object-contain object-center scale-[1.02] group-hover:scale-[1.05]",
   Moletons: "object-contain object-center scale-[1.05] group-hover:scale-[1.08]",
-  Perfumes: "object-contain object-center scale-[0.92] group-hover:scale-[0.96]"
+  Perfumes: "object-contain object-center scale-[0.92] group-hover:scale-[0.96]",
+  Calças: "object-contain object-center scale-[0.96] group-hover:scale-[1.00]"
 };
 
-const homeCategoryOrder: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Shorts", "Bonés", "Tênis", "Óculos", "Perfumes"];
+const homeCategoryOrder: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Shorts", "Bonés", "Tênis", "Óculos", "Perfumes", "Calças"];
 
 const benefits = [
   {
@@ -124,25 +126,36 @@ export default function Home() {
               Ver tudo
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
+          <div className="scrollbar-none flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 sm:grid sm:grid-cols-4 sm:overflow-visible sm:pb-0 lg:grid-cols-9">
             {homeCategoryOrder.map((category) => {
               return (
                 <Link
                   key={category}
-                  href={`/catalogo?categoria=${category}`}
-                  className="group overflow-hidden rounded-md border border-neutral-200 bg-white text-center shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-neutral-950 hover:shadow-[0_16px_36px_rgba(15,23,42,0.08)]"
+                  href={{ pathname: "/catalogo", query: { categoria: category } }}
+                  className="group w-[72vw] max-w-[260px] flex-none snap-start overflow-hidden rounded-md border border-neutral-200 bg-white text-center shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-neutral-950 hover:shadow-[0_16px_36px_rgba(15,23,42,0.08)] sm:w-auto sm:max-w-none"
                 >
                   <span className="relative block h-24 overflow-hidden bg-neutral-100 sm:h-32">
-                    <Image
-                      src={categoryCovers[category]}
-                      alt={category}
-                      fill
-                      sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
-                      className={`transition duration-300 ${categoryImageFit[category]}`}
-                    />
+                    {category === "Calças" ? (
+                      <Image
+                        src={categoryCovers[category]}
+                        alt={category}
+                        fill
+                        unoptimized
+                        sizes="72vw"
+                        className={`transition duration-300 ${categoryImageFit[category]}`}
+                      />
+                    ) : (
+                      <Image
+                        src={categoryCovers[category]}
+                        alt={category}
+                        fill
+                        sizes="(min-width: 1024px) 11vw, (min-width: 640px) 25vw, 72vw"
+                        className={`transition duration-300 ${categoryImageFit[category]}`}
+                      />
+                    )}
                     <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent" />
                   </span>
-                  <span className="block px-3 py-3 font-[Montserrat,Inter,Arial,sans-serif] text-sm font-medium tracking-normal text-neutral-950 sm:text-base">
+                  <span className="block px-3 py-3 text-sm font-medium tracking-normal text-neutral-950 sm:text-base">
                     {category}
                   </span>
                 </Link>

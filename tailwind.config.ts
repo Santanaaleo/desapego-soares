@@ -18,8 +18,8 @@ const config: Config = {
         }
       },
       fontFamily: {
-        sans: ["Montserrat", "Inter", "Arial", "sans-serif"],
-        display: ["Montserrat", "Inter", "Arial", "sans-serif"]
+        sans: ["var(--font-poppins)", "sans-serif"],
+        display: ["var(--font-poppins)", "sans-serif"]
       },
       boxShadow: {
         soft: "0 18px 50px rgba(17, 17, 17, 0.08)"

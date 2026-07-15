@@ -48,6 +48,17 @@ b {
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand;
 }
 
+.size-option-unavailable::after {
+  position: absolute;
+  top: 50%;
+  left: -10%;
+  width: 120%;
+  height: 1px;
+  background: currentColor;
+  content: "";
+  transform: rotate(-28deg);
+}
+
 @keyframes top-marquee {
   from {
     transform: translateX(0);

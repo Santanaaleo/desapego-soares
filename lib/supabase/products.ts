@@ -33,6 +33,39 @@ export function validateProductInput(input: ProductWriteInput) {
     return "Informe um preço antigo maior que zero ou deixe o campo vazio.";
   }
 
+  if ("images" in input) {
+    if (!Array.isArray(input.images) || input.images.length === 0) {
+      return "Envie pelo menos uma imagem do produto.";
+    }
+
+    const invalidImage = input.images.some((image) => {
+      if (typeof image !== "string" || !image.trim()) return true;
+      if (image.startsWith("/")) return image !== image.toLowerCase();
+
+      try {
+        const url = new URL(image);
+        return (
+          url.protocol !== "https:" ||
+          !url.hostname.endsWith(".supabase.co") ||
+          !url.pathname.startsWith("/storage/v1/object/public/product-images/")
+        );
+      } catch {
+        return true;
+      }
+    });
+
+    if (invalidImage) {
+      return "Use imagens locais com caminho minúsculo ou URLs públicas válidas do Supabase Storage.";
+    }
+  }
+
+  if (
+    "size_options" in input &&
+    (!Array.isArray(input.size_options) || input.size_options.some((size) => typeof size !== "string" || !size.trim()))
+  ) {
+    return "Informe uma grade de tamanhos válida.";
+  }
+
   return null;
 }
 
@@ -45,6 +78,10 @@ function normalizeProductInput<T extends ProductWriteInput>(input: T) {
 
   return {
     ...input,
+    ...("sizes" in input ? { sizes: Array.from(new Set((input.sizes ?? []).map((size) => size.trim()).filter(Boolean))) } : {}),
+    ...("size_options" in input
+      ? { size_options: Array.from(new Set((input.size_options ?? []).map((size) => size.trim()).filter(Boolean))) }
+      : {}),
     ...("compare_at_price" in input ? { compare_at_price: compareAtPrice ?? null } : {}),
     ...(stockQuantity !== undefined
       ? {

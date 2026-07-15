@@ -8,6 +8,7 @@ import { addProductToCart, cartStorageKey } from "@/lib/cart";
 import { formatPrice } from "@/lib/formatters";
 import { calculateBestInstallment } from "@/lib/installments";
 import { getProductSale } from "@/lib/product-pricing";
+import { getProductSizeGrid, normalizeSizes } from "@/lib/product-sizes";
 import type { CartItem } from "@/types/cart";
 import type { Product } from "@/types/product";
 
@@ -16,15 +17,24 @@ export function ProductDetails({ product }: { product: Product }) {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedVariation, setSelectedVariation] = useState("");
   const [error, setError] = useState("");
-  const availableSizes = product.sizes.filter(Boolean);
+  const availableSizes = normalizeSizes(product.sizes);
+  const availableSizeSet = new Set(availableSizes);
+  const displayedSizes = getProductSizeGrid(product);
   const availableVariations = Array.from(new Set((product.variations ?? []).map((variation) => variation.trim()).filter(Boolean)));
   const bestInstallment = calculateBestInstallment(product.price);
   const unavailable = product.sold_out || product.stock_quantity <= 0;
+  const noAvailableConfiguredSize = displayedSizes.length > 0 && availableSizes.length === 0;
   const sale = getProductSale(product);
 
   function addToCart() {
     if (unavailable) {
       setError("Este produto está esgotado e não pode ser adicionado a sacola.");
+      setAdded(false);
+      return;
+    }
+
+    if (noAvailableConfiguredSize) {
+      setError("Este produto não possui tamanho disponível no momento.");
       setAdded(false);
       return;
     }
@@ -113,27 +123,36 @@ export function ProductDetails({ product }: { product: Product }) {
         ) : null}
       </div>
 
-      {availableSizes.length ? (
+      {displayedSizes.length ? (
         <div>
           <p className="mb-3 text-sm font-semibold uppercase text-neutral-950">Escolha o tamanho</p>
           <div className="grid grid-cols-4 gap-2">
-            {availableSizes.map((size) => (
-              <button
-                key={size}
-                type="button"
-                onClick={() => {
-                  setSelectedSize(size);
-                  setError("");
-                }}
-                className={`focus-ring h-11 rounded-md border text-sm font-semibold transition ${
-                  selectedSize === size
-                    ? "border-brand bg-brand text-white"
-                    : "border-neutral-300 bg-white text-neutral-950 hover:border-brand hover:text-brand"
-                }`}
-              >
-                {size}
-              </button>
-            ))}
+            {displayedSizes.map((size) => {
+              const sizeAvailable = availableSizeSet.has(size) && !unavailable;
+
+              return (
+                <button
+                  key={size}
+                  type="button"
+                  disabled={!sizeAvailable}
+                  aria-disabled={!sizeAvailable}
+                  aria-label={sizeAvailable ? `Tamanho ${size}` : `Tamanho ${size} indisponível`}
+                  onClick={() => {
+                    setSelectedSize(size);
+                    setError("");
+                  }}
+                  className={`focus-ring relative h-11 overflow-hidden rounded-md border text-sm font-semibold transition ${
+                    !sizeAvailable
+                      ? "size-option-unavailable cursor-not-allowed border-neutral-200 bg-neutral-100 text-neutral-400"
+                      : selectedSize === size
+                        ? "border-brand bg-brand text-white"
+                        : "border-neutral-300 bg-white text-neutral-950 hover:border-brand hover:text-brand"
+                  }`}
+                >
+                  {size}
+                </button>
+              );
+            })}
           </div>
         </div>
       ) : null}
@@ -171,9 +190,13 @@ export function ProductDetails({ product }: { product: Product }) {
 
       {error ? <p className="text-sm font-normal text-red-600">{error}</p> : null}
 
-      <Button onClick={addToCart} className="gap-2 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600" disabled={unavailable}>
+      <Button
+        onClick={addToCart}
+        className="gap-2 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600"
+        disabled={unavailable || noAvailableConfiguredSize}
+      >
         <ShoppingBag size={18} />
-        {unavailable ? "Esgotado" : added ? "Adicionar mais uma" : "Adicionar a sacola"}
+        {unavailable ? "Esgotado" : noAvailableConfiguredSize ? "Tamanhos indisponíveis" : added ? "Adicionar mais uma" : "Adicionar a sacola"}
       </Button>
       {added ? (
         <div className="rounded-md border border-brand/30 bg-brand-mist p-3 text-sm font-normal text-brand">

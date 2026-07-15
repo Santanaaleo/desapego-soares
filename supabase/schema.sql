@@ -7,6 +7,7 @@ create table if not exists products (
   category text not null,
   brand text,
   sizes text[] default '{}',
+  size_options text[] not null default '{}',
   condition text,
   featured boolean default false,
   active boolean default true,
@@ -24,6 +25,9 @@ alter table products
 
 alter table products
   add column if not exists variations text[] not null default '{}'::text[];
+
+alter table products
+  add column if not exists size_options text[] not null default '{}'::text[];
 
 alter table order_items
   add column if not exists variation text;

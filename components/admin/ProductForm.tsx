@@ -5,6 +5,15 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { categories } from "@/lib/constants";
 import { formatPrice, slugify } from "@/lib/formatters";
+import {
+  getDefaultNumericSizes,
+  getProductSizeGrid,
+  inferProductSizeType,
+  isNumericSize,
+  letterSizes,
+  normalizeSizes,
+  type ProductSizeType
+} from "@/lib/product-sizes";
 import type { Product, ProductInput } from "@/types/product";
 import { ImageUpload } from "./ImageUpload";
 
@@ -21,7 +30,16 @@ export function ProductForm({ product, onSubmit }: Props) {
   const [saleActive, setSaleActive] = useState(product?.sale_active ?? false);
   const [category, setCategory] = useState<ProductInput["category"]>(product?.category || "Polos");
   const [brand, setBrand] = useState(product?.brand || "");
-  const [sizesText, setSizesText] = useState(product?.sizes.join(", ") || "");
+  const [sizeType, setSizeType] = useState<ProductSizeType>(() =>
+    inferProductSizeType({ sizes: product?.sizes ?? [], size_options: product?.size_options })
+  );
+  const [sizes, setSizes] = useState(() => normalizeSizes(product?.sizes));
+  const [sizeOptions, setSizeOptions] = useState(() =>
+    product ? getProductSizeGrid(product) : [...letterSizes]
+  );
+  const [customNumbersText, setCustomNumbersText] = useState(() =>
+    product && inferProductSizeType(product) === "numbers" ? getProductSizeGrid(product).join(", ") : ""
+  );
   const [variationsText, setVariationsText] = useState(product?.variations?.join(", ") || "");
   const [condition, setCondition] = useState(product?.condition || "");
   const [featured, setFeatured] = useState(product?.featured || false);
@@ -44,6 +62,75 @@ export function ProductForm({ product, onSubmit }: Props) {
       ? previewCompareAtPrice - previewPrice
       : null;
   const previewPercentOff = previewSavings && previewCompareAtPrice ? Math.round((previewSavings / previewCompareAtPrice) * 100) : null;
+  const usesCustomNumericSizes = category !== "Tênis" && category !== "Calças";
+
+  function changeSizeType(nextType: ProductSizeType) {
+    if (nextType === sizeType) return;
+
+    const compatibleSizes = sizes.filter((size) => {
+      if (nextType === "none") return false;
+      return nextType === "numbers" ? isNumericSize(size) : !isNumericSize(size);
+    });
+    const standardCurrentOptions = new Set(sizeType === "letters" ? letterSizes : getDefaultNumericSizes(category));
+    const hasIncompatibleCustomOptions = sizeOptions.some((size) => {
+      if (standardCurrentOptions.has(size)) return false;
+      if (nextType === "none") return true;
+      return nextType === "numbers" ? !isNumericSize(size) : isNumericSize(size);
+    });
+
+    if (compatibleSizes.length !== sizes.length || hasIncompatibleCustomOptions) {
+      const confirmed = window.confirm("Mudar o tipo limpará tamanhos ou opções incompatíveis. Deseja continuar?");
+      if (!confirmed) return;
+    }
+
+    setSizeType(nextType);
+    setSizes(compatibleSizes);
+
+    if (nextType === "none") {
+      setSizeOptions([]);
+      setCustomNumbersText("");
+      return;
+    }
+
+    if (nextType === "letters") {
+      const nextOptions = normalizeSizes([...letterSizes, ...sizeOptions.filter((size) => !isNumericSize(size)), ...compatibleSizes]);
+      setSizeOptions(nextOptions);
+      return;
+    }
+
+    const nextOptions = normalizeSizes([
+      ...getDefaultNumericSizes(category),
+      ...sizeOptions.filter(isNumericSize),
+      ...compatibleSizes
+    ]);
+    setSizeOptions(nextOptions);
+    setCustomNumbersText(nextOptions.join(", "));
+  }
+
+  function changeCategory(nextCategory: ProductInput["category"]) {
+    if (sizeType === "numbers") {
+      const previousDefaults = new Set(getDefaultNumericSizes(category));
+      const preservedOptions = sizeOptions.filter((size) => !previousDefaults.has(size) || sizes.includes(size));
+      const nextOptions = normalizeSizes([...getDefaultNumericSizes(nextCategory), ...preservedOptions, ...sizes]);
+      setSizeOptions(nextOptions);
+      setCustomNumbersText(nextOptions.join(", "));
+    }
+
+    setCategory(nextCategory);
+  }
+
+  function toggleSize(size: string) {
+    setSizes((current) => current.includes(size) ? current.filter((item) => item !== size) : [...current, size]);
+  }
+
+  function changeCustomNumericSizes(value: string) {
+    setCustomNumbersText(value);
+    const parsedOptions = value
+      .split(/[\s,]+/)
+      .map((size) => size.trim())
+      .filter((size) => isNumericSize(size));
+    setSizeOptions(normalizeSizes([...parsedOptions, ...sizes.filter(isNumericSize)]));
+  }
 
   function parsePrice(value: string) {
     const normalized = value.trim().replace(/\./g, "").replace(",", ".");
@@ -55,10 +142,6 @@ export function ProductForm({ product, onSubmit }: Props) {
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    const sizes = sizesText
-      .split(",")
-      .map((size) => size.trim())
-      .filter(Boolean);
     const variations = variationsText
       .split(",")
       .map((variation) => variation.trim())
@@ -92,6 +175,16 @@ export function ProductForm({ product, onSubmit }: Props) {
       return;
     }
 
+    if (!images.length) {
+      setError("Envie pelo menos uma imagem do produto.");
+      return;
+    }
+
+    if (sizeType === "numbers" && !sizeOptions.length) {
+      setError("Informe pelo menos uma opção para a grade numérica.");
+      return;
+    }
+
     setError("");
 
     onSubmit({
@@ -103,14 +196,15 @@ export function ProductForm({ product, onSubmit }: Props) {
       sale_active: saleActive,
       category,
       brand,
-      sizes,
+      sizes: sizeType === "none" ? [] : normalizeSizes(sizes),
+      size_options: sizeType === "none" ? [] : normalizeSizes([...sizeOptions, ...sizes]),
       variations,
       condition,
       featured,
       active,
       sold_out: numericStock === 0 ? true : soldOut,
       stock_quantity: numericStock,
-      images: images.length ? images : ["/produtos/polos/polo-3.jpeg"]
+      images
     });
   }
 
@@ -127,7 +221,7 @@ export function ProductForm({ product, onSubmit }: Props) {
         />
         <select
           value={category}
-          onChange={(event) => setCategory(event.target.value as ProductInput["category"])}
+          onChange={(event) => changeCategory(event.target.value as ProductInput["category"])}
           className="focus-ring h-11 rounded-md border border-neutral-200 bg-white px-4 text-sm font-normal"
         >
           {categories.map((item) => (
@@ -187,16 +281,93 @@ export function ProductForm({ product, onSubmit }: Props) {
         ) : null}
       </div>
 
-      <div className="grid gap-3">
-        <p className="text-sm font-semibold uppercase text-neutral-950">Tamanhos disponíveis</p>
-        <Input
-          value={sizesText}
-          onChange={(event) => setSizesText(event.target.value)}
-          placeholder="Ex: P, M, G, GG ou 38, 39, 40, 41"
-        />
-        <p className="text-xs font-normal text-neutral-500">
-          Separe por vírgula. Deixe vazio para produtos sem tamanho, como óculos.
-        </p>
+      <div className="grid gap-4 rounded-md border border-neutral-200 p-4">
+        <fieldset>
+          <legend className="text-sm font-semibold uppercase text-neutral-950">Tipo de tamanho</legend>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            {([
+              ["letters", "Letras"],
+              ["numbers", "Números"],
+              ["none", "Sem tamanho"]
+            ] as const).map(([value, label]) => (
+              <label
+                key={value}
+                className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-md border px-3 text-sm font-semibold ${
+                  sizeType === value ? "border-brand bg-brand-mist text-brand" : "border-neutral-200 bg-white text-neutral-800"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="size-type"
+                  value={value}
+                  checked={sizeType === value}
+                  onChange={() => changeSizeType(value)}
+                  className="accent-brand"
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        {sizeType === "letters" ? (
+          <fieldset>
+            <legend className="text-sm font-semibold text-neutral-950">Marque os tamanhos disponíveis</legend>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {sizeOptions.map((size) => (
+                <label key={size} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md border border-neutral-200 px-3 text-sm font-semibold">
+                  <input
+                    type="checkbox"
+                    checked={sizes.includes(size)}
+                    onChange={() => toggleSize(size)}
+                    className="accent-brand"
+                  />
+                  {size}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ) : null}
+
+        {sizeType === "numbers" ? (
+          <div className="grid gap-3">
+            {usesCustomNumericSizes ? (
+              <div className="grid gap-2">
+                <label htmlFor="custom-size-options" className="text-sm font-semibold text-neutral-950">
+                  Opções da grade numérica
+                </label>
+                <Input
+                  id="custom-size-options"
+                  value={customNumbersText}
+                  onChange={(event) => changeCustomNumericSizes(event.target.value)}
+                  placeholder="Ex: 2, 4, 6, 8 ou 38, 40, 42"
+                  inputMode="numeric"
+                />
+                <p className="text-xs font-normal text-neutral-500">Separe os números por vírgula e marque abaixo os disponíveis.</p>
+              </div>
+            ) : null}
+            <fieldset>
+              <legend className="text-sm font-semibold text-neutral-950">Marque os números disponíveis</legend>
+              <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
+                {sizeOptions.map((size) => (
+                  <label key={size} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md border border-neutral-200 px-3 text-sm font-semibold">
+                    <input
+                      type="checkbox"
+                      checked={sizes.includes(size)}
+                      onChange={() => toggleSize(size)}
+                      className="accent-brand"
+                    />
+                    {size}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+        ) : null}
+
+        {sizeType === "none" ? (
+          <p className="text-sm font-normal text-neutral-600">Este produto será vendido sem seleção de tamanho.</p>
+        ) : null}
       </div>
 
       <div className="grid gap-3 rounded-md border border-neutral-200 bg-neutral-50 p-4">

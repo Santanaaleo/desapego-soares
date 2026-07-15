@@ -3,8 +3,8 @@ import { requireAdmin } from "@/lib/admin-server";
 import { uploadProductImage } from "@/lib/supabase/storage";
 
 const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
-const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
-const SUPPORTED_IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "heic", "heif"];
+const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const SUPPORTED_IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp"];
 
 function getExtension(file: File) {
   return file.name.split(".").pop()?.toLowerCase() || "";
@@ -20,9 +20,6 @@ function getFileType(file: File) {
   if (extension === "jpg" || extension === "jpeg") return "image/jpeg";
   if (extension === "png") return "image/png";
   if (extension === "webp") return "image/webp";
-  if (extension === "heic") return "image/heic";
-  if (extension === "heif") return "image/heif";
-
   return "";
 }
 
@@ -42,7 +39,7 @@ export async function POST(request: Request) {
 
     if (!SUPPORTED_IMAGE_TYPES.includes(fileType) || !SUPPORTED_IMAGE_EXTENSIONS.includes(extension)) {
       return NextResponse.json(
-        { message: "Formato não suportado. Envie imagens jpg, jpeg, png, webp, heic ou heif." },
+        { message: "Formato não suportado. Envie imagens jpg, jpeg, png ou webp." },
         { status: 400 }
       );
     }
@@ -52,6 +49,13 @@ export async function POST(request: Request) {
     }
 
     const url = await uploadProductImage(file);
+    const publicImage = await fetch(url, { cache: "no-store" });
+    const contentType = publicImage.headers.get("content-type") || "";
+
+    if (!publicImage.ok || !contentType.startsWith("image/")) {
+      throw new Error("A imagem foi enviada, mas a URL pública do Storage não é válida.");
+    }
+
     return NextResponse.json({ url });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Não foi possível enviar a imagem.";

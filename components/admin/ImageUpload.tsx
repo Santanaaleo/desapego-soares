@@ -33,6 +33,23 @@ function loadImage(file: File) {
   });
 }
 
+function loadImageUrl(url: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new window.Image();
+
+    image.onload = () => {
+      if (image.naturalWidth > 0 && image.naturalHeight > 0) {
+        resolve(image);
+        return;
+      }
+
+      reject(new Error("A imagem enviada não possui dimensões válidas."));
+    };
+    image.onerror = () => reject(new Error("A URL pública da imagem não pôde ser carregada."));
+    image.src = url;
+  });
+}
+
 function getFileExtension(file: File) {
   return file.name.split(".").pop()?.toLowerCase() || "";
 }
@@ -93,43 +110,40 @@ function canvasToBlob(canvas: HTMLCanvasElement, type = "image/jpeg", quality = 
 
 async function resizeImage(file: File) {
   const type = getUploadType(file);
+  const mustConvert = type === "image/heic" || type === "image/heif";
+  const image = await loadImage(file);
 
-  if (type === "image/heic" || type === "image/heif") {
+  if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
+    throw new Error("A imagem enviada não possui dimensões válidas.");
+  }
+
+  const scale = Math.min(1, MAX_IMAGE_WIDTH / image.naturalWidth, MAX_IMAGE_HEIGHT / image.naturalHeight);
+
+  if (!mustConvert && scale === 1 && file.size <= 2 * 1024 * 1024) {
     return file;
   }
 
-  try {
-    const image = await loadImage(file);
-    const scale = Math.min(1, MAX_IMAGE_WIDTH / image.naturalWidth, MAX_IMAGE_HEIGHT / image.naturalHeight);
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
 
-    if (scale === 1 && file.size <= 2 * 1024 * 1024) {
-      return file;
-    }
+  if (!context) {
+    throw new Error("Não foi possível processar a imagem neste navegador.");
+  }
 
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
+  canvas.width = Math.round(image.naturalWidth * scale);
+  canvas.height = Math.round(image.naturalHeight * scale);
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-    if (!context) {
-      return file;
-    }
+  const outputType = type === "image/png" ? "image/png" : "image/jpeg";
+  const blob = await canvasToBlob(canvas, outputType, 0.82);
 
-    canvas.width = Math.round(image.naturalWidth * scale);
-    canvas.height = Math.round(image.naturalHeight * scale);
-    context.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-    const outputType = type === "image/png" ? "image/png" : "image/jpeg";
-    const blob = await canvasToBlob(canvas, outputType, 0.82);
-
-    if (blob.size >= file.size) {
-      return file;
-    }
-
-    const extension = outputType === "image/png" ? "png" : "jpg";
-    const baseName = file.name.replace(/\.[^.]+$/, "") || "imagem";
-    return new File([blob], `${baseName}.${extension}`, { type: outputType, lastModified: file.lastModified });
-  } catch {
+  if (!mustConvert && blob.size >= file.size) {
     return file;
   }
+
+  const extension = outputType === "image/png" ? "png" : "jpg";
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "imagem";
+  return new File([blob], `${baseName}.${extension}`, { type: outputType, lastModified: file.lastModified });
 }
 
 async function trimTransparentPng(file: File) {
@@ -233,6 +247,7 @@ export function ImageUpload({ images, onChange }: Props) {
           throw new Error(data?.message || "Erro ao salvar no storage.");
         }
 
+        await loadImageUrl(data.url);
         urls.push(data.url);
       }
 

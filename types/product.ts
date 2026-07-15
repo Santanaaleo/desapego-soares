@@ -11,6 +11,7 @@ export type Product = {
   category: ProductCategory;
   brand: string;
   sizes: string[];
+  size_options?: string[];
   variations: string[];
   condition: string;
   featured: boolean;

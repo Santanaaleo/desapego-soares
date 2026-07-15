@@ -19,8 +19,25 @@ import { ImageUpload } from "./ImageUpload";
 
 type Props = {
   product?: Product;
-  onSubmit: (input: ProductInput) => void;
+  onSubmit: (input: ProductInput) => void | Promise<void>;
 };
+
+function validateRenderedImage(url: string, index: number) {
+  return new Promise<void>((resolve, reject) => {
+    const image = new window.Image();
+
+    image.onload = () => {
+      if (image.naturalWidth > 0 && image.naturalHeight > 0) {
+        resolve();
+        return;
+      }
+
+      reject(new Error(`A imagem ${index + 1} não possui dimensões válidas.`));
+    };
+    image.onerror = () => reject(new Error(`A imagem ${index + 1} não pôde ser carregada. Remova-a ou envie novamente.`));
+    image.src = url;
+  });
+}
 
 export function ProductForm({ product, onSubmit }: Props) {
   const [name, setName] = useState(product?.name || "");
@@ -47,6 +64,8 @@ export function ProductForm({ product, onSubmit }: Props) {
   const [soldOut, setSoldOut] = useState(product?.sold_out ?? false);
   const [stockQuantity, setStockQuantity] = useState(product?.stock_quantity.toString() || "1");
   const [images, setImages] = useState(product?.images || []);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const slug = useMemo(() => slugify(name), [name]);
@@ -139,7 +158,7 @@ export function ProductForm({ product, onSubmit }: Props) {
     return Number.isFinite(parsed) ? Math.round(parsed * 100) / 100 : NaN;
   }
 
-  function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
     const variations = variationsText
@@ -185,27 +204,40 @@ export function ProductForm({ product, onSubmit }: Props) {
       return;
     }
 
+    if (uploadingImages) {
+      setError("Aguarde o envio de todas as imagens antes de salvar.");
+      return;
+    }
+
+    setSaving(true);
     setError("");
 
-    onSubmit({
-      name,
-      slug,
-      description,
-      price: numericPrice,
-      compare_at_price: numericCompareAtPrice,
-      sale_active: saleActive,
-      category,
-      brand,
-      sizes: sizeType === "none" ? [] : normalizeSizes(sizes),
-      size_options: sizeType === "none" ? [] : normalizeSizes([...sizeOptions, ...sizes]),
-      variations,
-      condition,
-      featured,
-      active,
-      sold_out: numericStock === 0 ? true : soldOut,
-      stock_quantity: numericStock,
-      images
-    });
+    try {
+      await Promise.all(images.map(validateRenderedImage));
+      await onSubmit({
+        name,
+        slug,
+        description,
+        price: numericPrice,
+        compare_at_price: numericCompareAtPrice,
+        sale_active: saleActive,
+        category,
+        brand,
+        sizes: sizeType === "none" ? [] : normalizeSizes(sizes),
+        size_options: sizeType === "none" ? [] : normalizeSizes([...sizeOptions, ...sizes]),
+        variations,
+        condition,
+        featured,
+        active,
+        sold_out: numericStock === 0 ? true : soldOut,
+        stock_quantity: numericStock,
+        images
+      });
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "Não foi possível validar as imagens do produto.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -400,9 +432,11 @@ export function ProductForm({ product, onSubmit }: Props) {
           Produto esgotado
         </label>
       </div>
-      <ImageUpload images={images} onChange={setImages} />
+      <ImageUpload images={images} onChange={setImages} onUploadingChange={setUploadingImages} />
       {error ? <p className="text-sm font-normal text-red-600">{error}</p> : null}
-      <Button type="submit">{product ? "Salvar alterações" : "Cadastrar produto"}</Button>
+      <Button type="submit" disabled={uploadingImages || saving}>
+        {uploadingImages ? "Enviando imagens..." : saving ? "Validando imagens..." : product ? "Salvar alterações" : "Cadastrar produto"}
+      </Button>
     </form>
   );
 }

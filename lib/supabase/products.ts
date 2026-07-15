@@ -7,6 +7,57 @@ const table = "products";
 
 type ProductWriteInput = ProductInput | Partial<Product>;
 
+function getSupabaseOrigin() {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || "").origin;
+  } catch {
+    return "";
+  }
+}
+
+function hasExpectedImageSignature(bytes: Uint8Array, contentType: string) {
+  if (contentType === "image/png") {
+    return bytes.length >= 24 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
+  }
+
+  if (contentType === "image/jpeg") {
+    return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  }
+
+  if (contentType === "image/webp") {
+    return (
+      bytes.length >= 12 &&
+      String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3]) === "RIFF" &&
+      String.fromCharCode(bytes[8], bytes[9], bytes[10], bytes[11]) === "WEBP"
+    );
+  }
+
+  return false;
+}
+
+async function validateProductImagesAvailability(images: string[]) {
+  await Promise.all(
+    images.map(async (image, index) => {
+      if (image.startsWith("/")) return;
+
+      let response: Response;
+
+      try {
+        response = await fetch(image, { cache: "no-store" });
+      } catch {
+        throw new Error(`A imagem ${index + 1} não pôde ser acessada.`);
+      }
+
+      const contentType = (response.headers.get("content-type") || "").split(";", 1)[0].toLowerCase();
+      const bytes = new Uint8Array(await response.arrayBuffer());
+
+      if (!response.ok || !contentType.startsWith("image/") || !bytes.length || !hasExpectedImageSignature(bytes, contentType)) {
+        throw new Error(`A imagem ${index + 1} não é uma URL pública válida ou o arquivo não existe no Storage.`);
+      }
+    })
+  );
+}
+
 export function validateProductInput(input: ProductWriteInput) {
   if ("price" in input && (!Number.isFinite(input.price) || Number(input.price) <= 0)) {
     return "Informe um preço maior que zero.";
@@ -38,23 +89,29 @@ export function validateProductInput(input: ProductWriteInput) {
       return "Envie pelo menos uma imagem do produto.";
     }
 
-    const invalidImage = input.images.some((image) => {
-      if (typeof image !== "string" || !image.trim()) return true;
-      if (image.startsWith("/")) return image !== image.toLowerCase();
+    const normalizedImages = input.images.map((image) => typeof image === "string" ? image.trim() : "");
+    const hasDuplicates = new Set(normalizedImages).size !== normalizedImages.length;
+    const supabaseOrigin = getSupabaseOrigin();
+    const invalidImage = normalizedImages.some((image) => {
+      if (!image) return true;
+      if (image.startsWith("/")) {
+        return image !== image.toLowerCase() || image.includes("..") || image.startsWith("//");
+      }
 
       try {
         const url = new URL(image);
         return (
           url.protocol !== "https:" ||
-          !url.hostname.endsWith(".supabase.co") ||
-          !url.pathname.startsWith("/storage/v1/object/public/product-images/")
+          url.origin !== supabaseOrigin ||
+          !url.pathname.startsWith("/storage/v1/object/public/product-images/products/") ||
+          Boolean(url.search || url.hash || url.username || url.password)
         );
       } catch {
         return true;
       }
     });
 
-    if (invalidImage) {
+    if (invalidImage || hasDuplicates) {
       return "Use imagens locais com caminho minúsculo ou URLs públicas válidas do Supabase Storage.";
     }
   }
@@ -78,6 +135,7 @@ function normalizeProductInput<T extends ProductWriteInput>(input: T) {
 
   return {
     ...input,
+    ...("images" in input ? { images: (input.images ?? []).map((image) => image.trim()) } : {}),
     ...("sizes" in input ? { sizes: Array.from(new Set((input.sizes ?? []).map((size) => size.trim()).filter(Boolean))) } : {}),
     ...("size_options" in input
       ? { size_options: Array.from(new Set((input.size_options ?? []).map((size) => size.trim()).filter(Boolean))) }
@@ -156,6 +214,7 @@ export async function createProduct(input: ProductInput) {
 
   const validationError = validateProductInput(input);
   if (validationError) throw new Error(validationError);
+  await validateProductImagesAvailability(input.images);
 
   const { data, error } = await supabaseAdmin.from(table).insert(normalizeProductInput(input)).select().single();
   if (error) throw friendlyProductError(error);
@@ -167,6 +226,7 @@ export async function updateProduct(id: string, input: ProductInput) {
 
   const validationError = validateProductInput(input);
   if (validationError) throw new Error(validationError);
+  await validateProductImagesAvailability(input.images);
 
   const { data, error } = await supabaseAdmin
     .from(table)
@@ -191,6 +251,7 @@ export async function patchProduct(id: string, input: Partial<Product>) {
 
   const validationError = validateProductInput(input);
   if (validationError) throw new Error(validationError);
+  if (input.images) await validateProductImagesAvailability(input.images);
 
   const { data, error } = await supabaseAdmin
     .from(table)

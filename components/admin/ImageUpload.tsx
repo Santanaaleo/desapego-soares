@@ -13,7 +13,8 @@ const SUPPORTED_IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "heic", "heif"
 
 type Props = {
   images: string[];
-  onChange: (images: string[]) => void;
+  onChange: React.Dispatch<React.SetStateAction<string[]>>;
+  onUploadingChange?: (uploading: boolean) => void;
 };
 
 function loadImage(file: File) {
@@ -208,7 +209,7 @@ async function trimTransparentPng(file: File) {
   return new File([blob], file.name, { type: "image/png", lastModified: file.lastModified });
 }
 
-export function ImageUpload({ images, onChange }: Props) {
+export function ImageUpload({ images, onChange, onUploadingChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -217,6 +218,7 @@ export function ImageUpload({ images, onChange }: Props) {
     if (!files?.length) return;
 
     setUploading(true);
+    onUploadingChange?.(true);
     setError("");
 
     try {
@@ -251,11 +253,12 @@ export function ImageUpload({ images, onChange }: Props) {
         urls.push(data.url);
       }
 
-      onChange([...images, ...urls]);
+      onChange((current) => [...current, ...urls]);
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : "Não foi possível enviar a imagem.");
     } finally {
       setUploading(false);
+      onUploadingChange?.(false);
     }
 
     if (inputRef.current) {
@@ -264,7 +267,7 @@ export function ImageUpload({ images, onChange }: Props) {
   }
 
   function removeImage(imageToRemove: string) {
-    onChange(images.filter((image) => image !== imageToRemove));
+    onChange((current) => current.filter((image) => image !== imageToRemove));
 
     if (inputRef.current) {
       inputRef.current.value = "";
@@ -305,7 +308,7 @@ export function ImageUpload({ images, onChange }: Props) {
                   unoptimized={image.startsWith("data:")}
                 />
               </div>
-              <Button type="button" variant="secondary" className="h-9 gap-2" onClick={() => removeImage(image)}>
+              <Button type="button" variant="secondary" className="h-9 gap-2" onClick={() => removeImage(image)} disabled={uploading}>
                 <X size={15} />
                 Remover imagem
               </Button>

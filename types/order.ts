@@ -41,6 +41,7 @@ export type Order = {
   invoice_slug: string | null;
   receipt_url: string | null;
   capture_method: string | null;
+  stock_deducted_at: string | null;
   tracking_code: string | null;
   status: OrderStatus;
   customer_name: string;

@@ -152,7 +152,16 @@ export async function POST(request: Request) {
     return badRequest("Um ou mais produtos estão esgotados.");
   }
 
-  if (normalizedItems.some((item) => Number(productMap.get(item.productId)?.stock_quantity ?? 0) < item.quantity)) {
+  const quantitiesByProduct = normalizedItems.reduce<Map<string, number>>((quantities, item) => {
+    quantities.set(item.productId, (quantities.get(item.productId) ?? 0) + item.quantity);
+    return quantities;
+  }, new Map());
+
+  if (
+    Array.from(quantitiesByProduct).some(
+      ([productId, quantity]) => Number(productMap.get(productId)?.stock_quantity ?? 0) < quantity
+    )
+  ) {
     return badRequest("Quantidade máxima disponível em estoque.");
   }
 

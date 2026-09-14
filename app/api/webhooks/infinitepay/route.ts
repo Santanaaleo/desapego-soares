@@ -86,7 +86,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "Valor pago inválido." }, { status: 400 });
     }
 
-    const wasAlreadyPaid = existingOrder.status === "paid";
     const order = await markOrderPaidByOrderNsu({
       orderNsu,
       transactionNsu: clean(payload.transaction_nsu),
@@ -96,17 +95,17 @@ export async function POST(request: Request) {
     });
 
     if (!order) {
-      if (wasAlreadyPaid) {
-        console.info("[infinitepay:webhook] Pedido já estava pago:", { order_nsu: orderNsu });
-        return NextResponse.json({ ok: true });
-      }
-
       console.error("[infinitepay:webhook] Pedido não atualizado:", { order_nsu: orderNsu });
       return NextResponse.json({ ok: false, error: "Pedido não atualizado." }, { status: 500 });
     }
 
-    if (!wasAlreadyPaid && existingOrder.coupon_code) {
+    if (order.stock_deducted && existingOrder.coupon_code) {
       await incrementCouponUsage(existingOrder.coupon_code);
+    }
+
+    if (!order.stock_deducted) {
+      console.info("[infinitepay:webhook] Pagamento já processado:", { order_nsu: orderNsu });
+      return NextResponse.json({ ok: true });
     }
 
     console.info("[infinitepay:webhook] Pedido atualizado:", { id: order.id, order_nsu: order.order_nsu, status: order.status });

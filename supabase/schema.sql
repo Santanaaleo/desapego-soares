@@ -37,6 +37,11 @@ alter table products
 
 create index if not exists products_stock_quantity_idx on products (stock_quantity);
 
+alter table orders
+  add column if not exists stock_deducted_at timestamp with time zone;
+
+drop function if exists public.confirm_order_paid_with_stock(text, text, text, text, text);
+
 create or replace function confirm_order_paid_with_stock(
   input_order_nsu text,
   input_transaction_nsu text default null,
@@ -44,7 +49,7 @@ create or replace function confirm_order_paid_with_stock(
   input_receipt_url text default null,
   input_capture_method text default null
 )
-returns table(id uuid, order_nsu text, status text, coupon_code text)
+returns table(id uuid, order_nsu text, status text, coupon_code text, stock_deducted boolean)
 language plpgsql
 security definer
 set search_path = public
@@ -65,15 +70,32 @@ begin
     return;
   end if;
 
-  if order_row.status = 'paid' then
+  if order_row.stock_deducted_at is not null
+    or order_row.status in ('paid', 'shipped', 'delivered') then
+    return query
+      select order_row.id, order_row.order_nsu, order_row.status, order_row.coupon_code, false;
     return;
   end if;
 
-  for order_item in
-    select product_id, quantity
+  if not exists (
+    select 1
       from order_items
       where order_id = order_row.id
-        and product_id is not null
+  ) or exists (
+    select 1
+      from order_items
+      where order_id = order_row.id
+        and (product_id is null or quantity is null or quantity <= 0)
+  ) then
+    raise exception 'Pedido sem itens de produto válidos.';
+  end if;
+
+  for order_item in
+    select product_id, sum(quantity)::integer as quantity
+      from order_items
+      where order_id = order_row.id
+      group by product_id
+      order by product_id
   loop
     select stock_quantity
       into current_stock
@@ -93,25 +115,30 @@ begin
 
     update products
       set stock_quantity = next_stock,
-          sold_out = next_stock = 0,
+          sold_out = next_stock <= 0,
           updated_at = now()
       where products.id = order_item.product_id;
   end loop;
 
   update orders
     set status = 'paid',
-        transaction_nsu = input_transaction_nsu,
-        invoice_slug = input_invoice_slug,
-        receipt_url = input_receipt_url,
-        capture_method = input_capture_method,
+        transaction_nsu = coalesce(nullif(input_transaction_nsu, ''), orders.transaction_nsu),
+        invoice_slug = coalesce(nullif(input_invoice_slug, ''), orders.invoice_slug),
+        receipt_url = coalesce(nullif(input_receipt_url, ''), orders.receipt_url),
+        capture_method = coalesce(nullif(input_capture_method, ''), orders.capture_method),
+        stock_deducted_at = now(),
         updated_at = now()
     where orders.id = order_row.id
     returning orders.id, orders.order_nsu, orders.status, orders.coupon_code
     into id, order_nsu, status, coupon_code;
 
+  stock_deducted := true;
   return next;
 end;
 $$;
+
+revoke all on function public.confirm_order_paid_with_stock(text, text, text, text, text) from public, anon, authenticated;
+grant execute on function public.confirm_order_paid_with_stock(text, text, text, text, text) to service_role;
 
 create table if not exists coupons (
   id uuid primary key default gen_random_uuid(),

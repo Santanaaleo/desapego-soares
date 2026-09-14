@@ -60,6 +60,19 @@ export async function getOrderWithItemsByOrderNsu(orderNsu: string) {
 export async function updateOrderStatus(id: string, status: OrderStatus) {
   if (!supabaseAdmin) return null;
 
+  if (["paid", "shipped", "delivered"].includes(status)) {
+    const { data: existingOrder, error: existingOrderError } = await supabaseAdmin
+      .from(ordersTable)
+      .select("order_nsu")
+      .eq("id", id)
+      .single();
+    if (existingOrderError) throw existingOrderError;
+    if (!existingOrder.order_nsu) throw new Error("Pedido sem identificação de pagamento.");
+
+    const confirmedOrder = await markOrderPaidByOrderNsu({ orderNsu: existingOrder.order_nsu });
+    if (!confirmedOrder || status === "paid") return confirmedOrder;
+  }
+
   const { data, error } = await supabaseAdmin
     .from(ordersTable)
     .update({ status, updated_at: new Date().toISOString() })
@@ -138,5 +151,7 @@ export async function markOrderPaidByOrderNsu(input: {
     input_capture_method: input.captureMethod || null
   });
   if (error) throw error;
-  return ((data as Pick<Order, "id" | "order_nsu" | "status" | "coupon_code">[] | null) ?? [])[0] ?? null;
+  return (
+    (data as (Pick<Order, "id" | "order_nsu" | "status" | "coupon_code"> & { stock_deducted: boolean })[] | null) ?? []
+  )[0] ?? null;
 }

@@ -58,7 +58,7 @@ const categoryImageFit: Record<ProductCategory, string> = {
   Calças: "object-contain object-center scale-[0.96] group-hover:scale-[1.00]"
 };
 
-const homeCategoryOrder: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Shorts", "Bonés", "Tênis", "Óculos", "Perfumes", "Calças"];
+const homeCategoryOrder: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Shorts", "Calças", "Bonés", "Tênis", "Óculos", "Perfumes"];
 
 const benefits = [
   {

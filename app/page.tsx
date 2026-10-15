@@ -40,7 +40,7 @@ const categoryCovers: Record<ProductCategory, string> = {
   Shorts: "/categories/shorts.png?v=2",
   Bonés: "/categories/bones.png?v=2",
   Tênis: "/categories/tenis.png?v=2",
-  Óculos: "/categories/oculos.png?v=2",
+  Acessórios: "/categories/oculos.png?v=2",
   Moletons: "/categories/moletons.png?v=2",
   Perfumes: "/categories/perfumes.png?v=2",
   Calças: "/categories/calcas.png?v=2"
@@ -52,13 +52,13 @@ const categoryImageFit: Record<ProductCategory, string> = {
   Shorts: "object-contain object-center scale-[0.92] group-hover:scale-[0.96]",
   Bonés: "object-contain object-center scale-[1.06] group-hover:scale-[1.09]",
   Tênis: "object-contain object-center scale-[1.02] group-hover:scale-[1.05]",
-  Óculos: "object-contain object-center scale-[1.02] group-hover:scale-[1.05]",
+  Acessórios: "object-contain object-center scale-[1.02] group-hover:scale-[1.05]",
   Moletons: "object-contain object-center scale-[1.05] group-hover:scale-[1.08]",
   Perfumes: "object-contain object-center scale-[0.92] group-hover:scale-[0.96]",
   Calças: "object-contain object-center scale-[0.96] group-hover:scale-[1.00]"
 };
 
-const homeCategoryOrder: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Shorts", "Calças", "Bonés", "Tênis", "Óculos", "Perfumes"];
+const homeCategoryOrder: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Shorts", "Calças", "Bonés", "Tênis", "Acessórios", "Perfumes"];
 
 const benefits = [
   {

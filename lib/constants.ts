@@ -1,6 +1,6 @@
 import type { ProductCategory } from "@/types/product";
 
-export const categories: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Shorts", "Calças", "Bonés", "Tênis", "Óculos", "Perfumes"];
+export const categories: ProductCategory[] = ["Camisas", "Polos", "Moletons", "Shorts", "Calças", "Bonés", "Tênis", "Acessórios", "Perfumes"];
 
 export const homeProductSectionCategories: ProductCategory[] = [
   "Camisas",
@@ -10,7 +10,7 @@ export const homeProductSectionCategories: ProductCategory[] = [
   "Calças",
   "Bonés",
   "Tênis",
-  "Óculos",
+  "Acessórios",
   "Perfumes"
 ];
 

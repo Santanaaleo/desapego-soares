@@ -1,6 +1,6 @@
 import { supabase } from "./client";
 import { supabaseAdmin } from "./server";
-import { sortProductsWithSoldOutLast } from "@/lib/products";
+import { normalizeProduct, sortProductsWithSoldOutLast } from "@/lib/products";
 import type { Product, ProductInput } from "@/types/product";
 
 const table = "products";
@@ -163,7 +163,7 @@ export async function listProducts() {
 
   const { data, error } = await supabase.from(table).select("*").order("created_at", { ascending: false });
   if (error) throw error;
-  return data as Product[];
+  return (data as Product[]).map(normalizeProduct);
 }
 
 export async function listProductsForAdmin() {
@@ -171,7 +171,7 @@ export async function listProductsForAdmin() {
 
   const { data, error } = await supabaseAdmin.from(table).select("*").order("created_at", { ascending: false });
   if (error) throw error;
-  return data as Product[];
+  return (data as Product[]).map(normalizeProduct);
 }
 
 export async function listActiveProducts() {
@@ -183,7 +183,7 @@ export async function listActiveProducts() {
     .eq("active", true)
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return sortProductsWithSoldOutLast(data as Product[]);
+  return sortProductsWithSoldOutLast((data as Product[]).map(normalizeProduct));
 }
 
 export async function getActiveProductBySlug(slug: string) {
@@ -198,7 +198,7 @@ export async function getActiveProductBySlug(slug: string) {
     .limit(1)
     .maybeSingle();
   if (error) throw error;
-  return data as Product | null;
+  return data ? normalizeProduct(data as Product) : null;
 }
 
 export async function listActiveProductSlugs() {

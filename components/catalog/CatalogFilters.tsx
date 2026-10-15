@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { categories } from "@/lib/constants";
 import { ProductGrid } from "@/components/product/ProductGrid";
-import { sortProductsWithSoldOutLast } from "@/lib/products";
+import { normalizeProductCategory, sortProductsWithSoldOutLast } from "@/lib/products";
 import type { Product } from "@/types/product";
 
 export function CatalogFilters({
@@ -18,7 +18,7 @@ export function CatalogFilters({
   initialCategory?: string;
 }) {
   const [query, setQuery] = useState(initialQuery);
-  const [category, setCategory] = useState(initialCategory);
+  const [category, setCategory] = useState(normalizeProductCategory(initialCategory));
 
   function normalize(value: string) {
     return value

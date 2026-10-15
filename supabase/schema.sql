@@ -20,6 +20,10 @@ create index if not exists products_category_idx on products (category);
 create index if not exists products_featured_idx on products (featured);
 create index if not exists products_active_idx on products (active);
 
+update public.products
+set category = 'Acessórios'
+where lower(btrim(category)) in ('óculos', 'oculos');
+
 alter table products
   add column if not exists stock_quantity integer not null default 1;
 

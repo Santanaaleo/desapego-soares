@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { mockProducts } from "@/lib/mock-products";
+import { normalizeProduct } from "@/lib/products";
 import type { Product, ProductInput } from "@/types/product";
 
 const storageKey = "desapego-soares-products";
@@ -22,7 +23,7 @@ function readLocalProducts() {
 
 function normalizeLocalProduct(product: Product) {
   return {
-    ...product,
+    ...normalizeProduct(product),
     compare_at_price: product.compare_at_price ?? null,
     sale_active: product.sale_active ?? false
   };
@@ -49,7 +50,7 @@ export function useProducts({ admin = false }: { admin?: boolean } = {}) {
         if (!active) return;
 
         setHasSharedDatabase(true);
-        setProducts(data.products ?? []);
+        setProducts((data.products ?? []).map(normalizeProduct));
       } catch {
         if (active) {
           setHasSharedDatabase(false);
